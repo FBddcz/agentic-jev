@@ -160,9 +160,10 @@ test("same candidate snapshot supports feedback, comparison and exact score evid
   assert.equal(result.decisions[0].calls, 0);
   assert.equal(result.decisions[1].rows[0].score, 0.74);
   assert.equal(
-    result.decisions[1].rows.find((r) => r.id === s.candidates[1].id)!.retained,
+    result.decisions[1].rows.some((r) => r.id === s.candidates[1].id),
     false,
   );
+  assert.deepEqual(result.shortlist.excludedIds, [s.candidates[1].id]);
   assert.equal(result.snapshot.fingerprint, s.fingerprint);
   assert.equal(s.candidates.length, 2);
 });

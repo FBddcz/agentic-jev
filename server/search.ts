@@ -8,8 +8,9 @@ import {
   type SearchSnapshot,
   type SearchResult,
   type SearchDecision,
+  type SearchShortlist,
 } from "../src/search-types";
-import type { Decider } from "./engine";
+import type { Decider, DecisionResult } from "./engine";
 
 const SOURCES = Object.keys(sourceNames) as SearchSource[];
 const MODELS: Provider[] = ["baseline", "jev", "openai", "claude", "minicpm"];
@@ -115,7 +116,7 @@ export function normalizeResults(
 ): SearchCandidate[] {
   const out: SearchCandidate[] = [];
   const seen = new Set<string>();
-  for (const row of rows) {
+  for (const [index, row] of rows.entries()) {
     const url = canonicalUrl(row.url),
       title = plain(row.title, 300);
     if (!url || !title || seen.has(url)) continue;
@@ -127,6 +128,7 @@ export function normalizeResults(
       snippet: plain(row.snippet, 1800),
       sources: [source],
       originalRank: out.length + 1,
+      sourceRanks: { [source]: index + 1 },
       extra: row.extra,
       ...(row.paper ? { paper: row.paper } : {}),
     });
@@ -369,6 +371,10 @@ export async function retrieveSearch(
       if (old) {
         if (!old.sources.includes(result.source))
           old.sources.push(result.source);
+        old.sourceRanks = {
+          ...old.sourceRanks,
+          ...item.sourceRanks,
+        };
         if (item.snippet.length > old.snippet.length)
           old.snippet = item.snippet;
         if (item.paper) {
@@ -385,6 +391,7 @@ export async function retrieveSearch(
         map.set(item.url, {
           ...item,
           sources: [...item.sources],
+          sourceRanks: { ...item.sourceRanks },
           originalRank: map.size + 1,
         });
     }
@@ -445,10 +452,167 @@ function modelItem(c: SearchCandidate): Product {
     mission: "search",
   };
 }
+
+const SEARCH_SCORING_REVISION = "search-rubrics-v1";
+type CachedSearchScore = {
+  result: DecisionResult;
+  scoredAt: string;
+  originalMs: number;
+};
+
+/** Process-local exact-context cache. Never share candidate-only scores across prompts. */
+export class SearchScoreCache {
+  private entries = new Map<
+    string,
+    CachedSearchScore & { expiresAt: number; bytes: number }
+  >();
+  private bytes = 0;
+  private readonly maxEntries: number;
+  private readonly maxBytes: number;
+  private readonly ttlMs: number;
+  private readonly now: () => number;
+
+  constructor(
+    options: {
+      maxEntries?: number;
+      maxBytes?: number;
+      ttlMs?: number;
+      now?: () => number;
+    } = {},
+  ) {
+    this.maxEntries = options.maxEntries ?? 64;
+    this.maxBytes = options.maxBytes ?? 10 * 1024 * 1024;
+    this.ttlMs = options.ttlMs ?? 10 * 60 * 1000;
+    this.now = options.now ?? Date.now;
+    if (
+      ![this.maxEntries, this.maxBytes, this.ttlMs].every(
+        (n) => Number.isSafeInteger(n) && n > 0,
+      )
+    )
+      throw new Error("评分缓存容量与有效期需为正整数。");
+  }
+
+  private remove(key: string) {
+    const entry = this.entries.get(key);
+    if (entry) this.bytes -= entry.bytes;
+    this.entries.delete(key);
+  }
+
+  get(key: string): CachedSearchScore | undefined {
+    const entry = this.entries.get(key);
+    if (!entry) return undefined;
+    if (this.now() >= entry.expiresAt) {
+      this.remove(key);
+      return undefined;
+    }
+    // LRU eviction does not extend the original TTL.
+    this.entries.delete(key);
+    this.entries.set(key, entry);
+    return structuredClone({
+      result: entry.result,
+      scoredAt: entry.scoredAt,
+      originalMs: entry.originalMs,
+    });
+  }
+
+  set(key: string, result: DecisionResult, originalMs: number) {
+    const now = this.now();
+    const provenance = { scoredAt: new Date(now).toISOString(), originalMs };
+    for (const [id, entry] of this.entries)
+      if (now >= entry.expiresAt) this.remove(id);
+    this.remove(key);
+    const bytes = Buffer.byteLength(JSON.stringify(result));
+    if (bytes > this.maxBytes) return provenance;
+    this.entries.set(key, {
+      result: structuredClone(result),
+      ...provenance,
+      expiresAt: now + this.ttlMs,
+      bytes,
+    });
+    this.bytes += bytes;
+    while (this.entries.size > this.maxEntries || this.bytes > this.maxBytes)
+      this.remove(this.entries.keys().next().value!);
+    return provenance;
+  }
+
+  clear() {
+    this.entries.clear();
+    this.bytes = 0;
+  }
+}
+
+export type SearchRankOptions = {
+  cache?: SearchScoreCache;
+  /** Include model, endpoint and connection revision; never put API keys here. */
+  providerIdentity?: (provider: Provider) => string;
+  /** Bump when scoring rubrics change. Included even for otherwise identical inputs. */
+  promptRevision?: string;
+  /** Must match the batchDecider configuration used by deciderFor. */
+  batchSize?: number;
+};
+
+function shortlistSearch(
+  snapshot: SearchSnapshot,
+  intent: string,
+  limit: number | null,
+  liked: string[],
+  excluded: string[],
+) {
+  const start = performance.now();
+  const excludedSet = new Set(excluded);
+  const eligible = snapshot.candidates.filter((c) => !excludedSet.has(c.id));
+  const lexical = new Map(
+    eligible.map((c) => [c.id, overlap(intent, `${c.title} ${c.snippet}`)]),
+  );
+  const tie = (a: SearchCandidate, b: SearchCandidate) =>
+    a.originalRank - b.originalRank || a.id.localeCompare(b.id);
+  // Positive lexical overlap is one extra ranked list in reciprocal rank fusion.
+  // It never pretends to be an embedding or a model-generated relevance score.
+  const lexicalRanks = new Map(
+    [...eligible]
+      .filter((c) => lexical.get(c.id)! > 0)
+      .sort((a, b) => lexical.get(b.id)! - lexical.get(a.id)! || tie(a, b))
+      .map((c, i) => [c.id, i + 1]),
+  );
+  const fusion = (c: SearchCandidate) => {
+    const sourceScore = c.sources.reduce((sum, source) => {
+      // Legacy snapshots have only merged originalRank. New retrievals retain
+      // sourceRanks so deduplication does not lose upstream rank evidence.
+      const rank = c.sourceRanks?.[source] ?? c.originalRank;
+      return sum + 1 / (60 + rank);
+    }, 0);
+    const lexicalRank = lexicalRanks.get(c.id);
+    return sourceScore + (lexicalRank ? 1 / (60 + lexicalRank) : 0);
+  };
+  const ordered = [...eligible].sort(
+    (a, b) => fusion(b) - fusion(a) || tie(a, b),
+  );
+  const selectedIds = new Set(liked);
+  for (const c of ordered) {
+    if (limit !== null && selectedIds.size >= limit) break;
+    selectedIds.add(c.id);
+  }
+  const selected = ordered.filter((c) => selectedIds.has(c.id));
+  const shortlist: SearchShortlist = {
+    limit,
+    total: snapshot.candidates.length,
+    eligible: eligible.length,
+    selected: selected.length,
+    excludedIds: snapshot.candidates
+      .filter((c) => excludedSet.has(c.id))
+      .map((c) => c.id),
+    omittedIds: ordered.filter((c) => !selectedIds.has(c.id)).map((c) => c.id),
+    method: "rrf-60+lexical-v1",
+    ms: performance.now() - start,
+  };
+  return { selected, lexical, shortlist };
+}
+
 export async function rankSearch(
   snapshot: SearchSnapshot,
   input: any,
   deciderFor: (p: Provider) => Decider | undefined,
+  options: SearchRankOptions = {},
 ): Promise<SearchResult> {
   const intent = string(input?.intent, "需求描述", 1500);
   if (
@@ -466,6 +630,25 @@ export async function rankSearch(
     input.threshold > 1
   )
     throw new Error("筛选阈值需在 0–1 之间。");
+  const shortlistSize =
+    input.shortlistSize === undefined ? 24 : input.shortlistSize;
+  if (
+    shortlistSize !== null &&
+    (!Number.isInteger(shortlistSize) ||
+      shortlistSize < 1 ||
+      shortlistSize > 100)
+  )
+    throw new Error("精排候选数需为 1–100 的整数，或 null（全部）。");
+  if (
+    input.refreshScores !== undefined &&
+    typeof input.refreshScores !== "boolean"
+  )
+    throw new Error("重新评分选项需为布尔值。");
+  if (
+    options.batchSize !== undefined &&
+    (!Number.isSafeInteger(options.batchSize) || options.batchSize < 1)
+  )
+    throw new Error("模型批次大小需为正整数。");
   function ids(value: unknown): string[] {
     if (
       !Array.isArray(value) ||
@@ -480,11 +663,20 @@ export async function rankSearch(
     excluded = ids(input.excluded ?? []);
   if (liked.some((id) => excluded.includes(id)))
     throw new Error("同一候选不可同时喜欢与排除。");
-  const items = snapshot.candidates.map(modelItem),
-    lexical = new Map(
-      items.map((p) => [p.id, overlap(intent, `${p.name} ${p.subtitle}`)]),
-    ),
-    start = performance.now();
+  const start = performance.now();
+  const { selected, lexical, shortlist } = shortlistSearch(
+    snapshot,
+    intent,
+    shortlistSize,
+    liked,
+    excluded,
+  );
+  const items = selected.map(modelItem);
+  const allItems = snapshot.candidates.map(modelItem);
+  const feedback = {
+    liked: allItems.filter((p) => liked.includes(p.id)),
+    disliked: allItems.filter((p) => excluded.includes(p.id)),
+  };
   const decisions: SearchDecision[] = [];
   for (const provider of input.providers as Provider[]) {
     const t = performance.now();
@@ -502,8 +694,41 @@ export async function rankSearch(
         ads: false,
         adWeight: 0,
       };
-      let scored;
-      if (provider === "baseline")
+      // A cache identity is required for external models so reconfiguration
+      // cannot accidentally reuse a previous endpoint/model's successful result.
+      const identity =
+        provider === "baseline"
+          ? "lexical-overlap-v1"
+          : options.providerIdentity?.(provider);
+      const cacheKey =
+        options.cache && identity
+          ? createHash("sha256")
+              .update(
+                JSON.stringify({
+                  provider,
+                  identity,
+                  revision: options.promptRevision ?? SEARCH_SCORING_REVISION,
+                  batchSize: options.batchSize ?? 24,
+                  query: snapshot.query,
+                  market: snapshot.market ?? null,
+                  // Include the full candidate context, ordered shortlist, lexical
+                  // inputs and every feedback item, not a cache entry per candidate.
+                  candidates: snapshot.candidates,
+                  selected: items,
+                  lexical: [...lexical],
+                  config,
+                  feedback,
+                }),
+              )
+              .digest("hex")
+          : undefined;
+      const cached =
+        cacheKey && !input.refreshScores
+          ? options.cache!.get(cacheKey)
+          : undefined;
+      let scored: DecisionResult;
+      if (cached) scored = cached.result;
+      else if (provider === "baseline")
         scored = {
           evidence: items.map((p) => ({
             id: p.id,
@@ -514,14 +739,12 @@ export async function rankSearch(
                 ? 0.5 +
                   0.5 *
                     Math.max(
-                      ...items
-                        .filter((x) => liked.includes(x.id))
-                        .map((x) =>
-                          overlap(
-                            x.name + " " + x.subtitle,
-                            p.name + " " + p.subtitle,
-                          ),
+                      ...feedback.liked.map((x) =>
+                        overlap(
+                          x.name + " " + x.subtitle,
+                          p.name + " " + p.subtitle,
                         ),
+                      ),
                     )
                 : 0.5,
             confidence: null,
@@ -532,21 +755,20 @@ export async function rankSearch(
           calls: 0,
           usage: null,
           rawAnswers: null,
+          latency: 0,
         };
       else {
-        const decider = deciderFor(provider);
-        if (!decider) throw new Error("尚未配置此模型连接。");
+        const decider = items.length ? deciderFor(provider) : undefined;
+        if (items.length && !decider) throw new Error("尚未配置此模型连接。");
         scored = items.length
-          ? await decider(config, items, lexical, "search", {
-              liked: items.filter((p) => liked.includes(p.id)),
-              disliked: items.filter((p) => excluded.includes(p.id)),
-            })
+          ? await decider!(config, items, lexical, "search", feedback)
           : {
               evidence: [],
               model: `${provider}-not-called`,
               calls: 0,
               usage: null,
               rawAnswers: null,
+              latency: 0,
             };
       }
       if (
@@ -561,22 +783,19 @@ export async function rankSearch(
         )
       )
         throw new Error("评分不完整或越界，未生成替代结果。");
-      const rows = snapshot.candidates
+      const rows = selected
         .map((c) => {
           const evidence = scored.evidence.find((e) => e.id === c.id)!,
             score = 0.7 * evidence.relevance + 0.3 * evidence.affinity;
-          const retained = !excluded.includes(c.id) && score >= input.threshold;
+          const retained = score >= input.threshold;
           return {
             ...c,
             evidence,
             score,
             retained,
             rank: 0,
-            reason: excluded.includes(c.id)
-              ? "你已排除"
-              : score < input.threshold
-                ? "低于当前阈值"
-                : "达到当前匹配阈值",
+            reason:
+              score < input.threshold ? "低于当前阈值" : "达到当前匹配阈值",
           };
         })
         .sort(
@@ -586,15 +805,28 @@ export async function rankSearch(
             a.originalRank - b.originalRank,
         )
         .map((r, i) => ({ ...r, rank: i + 1 }));
+      const ms = performance.now() - t;
+      const original =
+        cached ??
+        (cacheKey && items.length
+          ? options.cache!.set(cacheKey, scored, ms)
+          : undefined);
       decisions.push({
         provider,
         model: scored.model,
         rows,
-        ms: performance.now() - t,
-        calls: scored.calls,
-        usage: scored.usage,
+        ms,
+        calls: cached ? 0 : scored.calls,
+        usage: cached ? null : scored.usage,
         rawAnswers: scored.rawAnswers,
         error: null,
+        cache: {
+          hit: !!cached,
+          scoredAt: original?.scoredAt ?? new Date().toISOString(),
+          originalMs: original?.originalMs ?? ms,
+          originalCalls: scored.calls,
+          originalUsage: scored.usage,
+        },
       });
     } catch (e) {
       decisions.push({
@@ -619,6 +851,7 @@ export async function rankSearch(
     liked,
     excluded,
     decisions,
+    shortlist,
     rankingMs: performance.now() - start,
     createdAt: new Date().toISOString(),
     scoring:

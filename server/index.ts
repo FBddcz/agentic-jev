@@ -23,11 +23,13 @@ import {
   retrieveSearch,
   rankSearch,
   SearchStore,
+  SearchScoreCache,
   type SearchKeys,
 } from "./search";
 import { recommendScene } from "./scene";
 import { runTryOn, tryOnStatus } from "./tryon";
 const searchStore = new SearchStore();
+const searchScoreCache = new SearchScoreCache();
 const searchKeys: SearchKeys = {
   tavily: process.env.TAVILY_API_KEY,
   search1api: process.env.SEARCH1API_API_KEY,
@@ -42,6 +44,26 @@ let apiKey = process.env.TYPESAFE_API_KEY || "",
   busy = false;
 const connections: Partial<Record<Provider, Connection>> = {};
 const verifiedProfiles = new Set<Provider>();
+// In-memory epochs invalidate cached scores even when only a credential changes.
+// Credentials themselves never enter a cache key, response or export.
+const connectionRevisions = new Map<Provider, number>();
+function connectionChanged(provider: Provider) {
+  connectionRevisions.set(
+    provider,
+    (connectionRevisions.get(provider) ?? 0) + 1,
+  );
+}
+function searchProviderIdentity(provider: Provider) {
+  return JSON.stringify({
+    provider,
+    revision: connectionRevisions.get(provider) ?? 0,
+    model: provider === "jev" ? model : (connections[provider]?.model ?? ""),
+    endpoint:
+      provider === "jev"
+        ? "https://api.typesafe.ai"
+        : (connections[provider]?.baseURL ?? ""),
+  });
+}
 function deciderFor(
   provider: Provider,
   domain: "shopping" | "search" = "shopping",
@@ -199,7 +221,10 @@ const server = createServer(async (req, res) => {
         return send(
           res,
           200,
-          await rankSearch(snapshot, data, (p) => deciderFor(p, "search")),
+          await rankSearch(snapshot, data, (p) => deciderFor(p, "search"), {
+            cache: searchScoreCache,
+            providerIdentity: searchProviderIdentity,
+          }),
         );
       }
       if (path === "/api/validate-config")
@@ -212,6 +237,7 @@ const server = createServer(async (req, res) => {
           if (data.clear === true) {
             delete connections[provider];
             verifiedProfiles.delete(provider);
+            connectionChanged(provider);
             return send(res, 200, status());
           }
           connections[provider] = validateConnection({
@@ -221,11 +247,13 @@ const server = createServer(async (req, res) => {
             key: data.key ?? "",
           });
           verifiedProfiles.delete(provider);
+          connectionChanged(provider);
           return send(res, 200, status());
         }
         if (data.clear === true) {
           apiKey = "";
           verified = false;
+          connectionChanged("jev");
           return send(res, 200, status());
         }
         if (
@@ -238,6 +266,7 @@ const server = createServer(async (req, res) => {
         apiKey = data.key;
         model = data.model;
         verified = false;
+        connectionChanged("jev");
         return send(res, 200, status());
       }
       if (path === "/api/replace") {

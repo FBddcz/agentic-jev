@@ -16,6 +16,11 @@ import {
 import type { Profile, Provider } from "./types";
 import { providerNames } from "./ModelPanels";
 import {
+  applySearchThreshold,
+  searchEvidenceExport,
+  searchPreferencesChanged,
+} from "./search-view";
+import {
   sourceNames,
   shoppingMarkets,
   type ShoppingMarket,
@@ -48,11 +53,13 @@ function saveJSON(value: unknown) {
 export function SearchLab({
   profiles,
   onModelSettings,
+  onStatusRefresh,
   shopping = false,
 }: {
   profiles: Profile[];
   shopping?: boolean;
   onModelSettings: () => void;
+  onStatusRefresh?: () => Promise<void>;
 }) {
   const locale = useLocale();
   const [market, setMarket] = useState<ShoppingMarket>("amazon");
@@ -64,6 +71,7 @@ export function SearchLab({
     ),
     [providers, setProviders] = useState<Provider[]>(["baseline"]),
     [limit, setLimit] = useState(20),
+    [shortlistSize, setShortlistSize] = useState<number | null>(24),
     [threshold, setThreshold] = useState(0.2);
   const [snapshot, setSnapshot] = useState<SearchSnapshot | null>(null),
     [result, setResult] = useState<SearchResult | null>(null),
@@ -74,6 +82,7 @@ export function SearchLab({
   const [stage, setStage] = useState<"idle" | "search" | "score">("idle"),
     [elapsed, setElapsed] = useState(0),
     [error, setError] = useState("");
+  const [errorDetails, setErrorDetails] = useState<string[]>([]);
   const [connect, setConnect] = useState(false),
     [keySource, setKeySource] = useState<"tavily" | "search1api" | "brave">(
       "tavily",
@@ -116,14 +125,17 @@ export function SearchLab({
       ? values.filter((v) => v !== value)
       : [...values, value];
   }
-  async function run(retrieve: boolean) {
+  async function run(retrieve: boolean, refreshScores = false) {
+    if (busy) return;
     if (!sources.length || !providers.length) {
       setError("至少选择一个来源和一个决策引擎。");
       return;
     }
     setError("");
+    setErrorDetails([]);
     setElapsed(0);
     setStage(retrieve ? "search" : "score");
+    let retrievedSnapshot: SearchSnapshot | null = null;
     try {
       const next: SearchSnapshot = retrieve
         ? await post("retrieve", {
@@ -134,21 +146,33 @@ export function SearchLab({
           })
         : snapshot!;
       if (!next) throw new Error("请先搜索获取候选。");
-      if (retrieve) {
-        setSnapshot(next);
-        setLiked([]);
-        setExcluded([]);
-        setResult(null);
-      }
+      if (retrieve) retrievedSnapshot = next;
       setStage("score");
       const scored: SearchResult = await post("rank", {
         snapshotId: next.id,
         intent: intent.trim() || query.trim(),
         providers,
         threshold,
+        shortlistSize,
+        refreshScores,
         liked: retrieve ? [] : liked,
         excluded: retrieve ? [] : excluded,
       });
+      if (
+        scored.decisions.every((d) => d.error) &&
+        result?.decisions.some((d) => !d.error)
+      ) {
+        setError("本轮评分失败，已保留上一轮有效结果。");
+        setErrorDetails(
+          scored.decisions.flatMap((d) => (d.error ? [d.error] : [])),
+        );
+        return;
+      }
+      if (retrieve) {
+        setSnapshot(next);
+        setLiked([]);
+        setExcluded([]);
+      }
       setResult(scored);
       setSelected(
         scored.decisions.find((d) => !d.error)?.provider || providers[0],
@@ -157,20 +181,31 @@ export function SearchLab({
         [
           ...h,
           {
-            label: retrieve ? "搜索＋决策" : "反馈重评",
+            label: retrieve
+              ? "搜索＋决策"
+              : refreshScores
+                ? "重新请求评分"
+                : "反馈重评",
             ms: (retrieve ? next.searchMs : 0) + scored.rankingMs,
           },
         ].slice(-12),
       );
     } catch (e) {
       setError((e as Error).message);
+      if (!result && retrievedSnapshot) {
+        setSnapshot(retrievedSnapshot);
+        setLiked([]);
+        setExcluded([]);
+      }
     } finally {
       setStage("idle");
+      void onStatusRefresh?.();
     }
   }
   async function saveKey(clear = false) {
     setNotice("");
     setError("");
+    setErrorDetails([]);
     try {
       await post("connect", { source: keySource, key, clear });
       setKey("");
@@ -183,8 +218,23 @@ export function SearchLab({
       setError((e as Error).message);
     }
   }
-  const decision = result?.decisions.find((d) => d.provider === selected);
+  const visibleResult = result && applySearchThreshold(result, threshold);
+  const decision = visibleResult?.decisions.find(
+    (d) => d.provider === selected,
+  );
   const rows = decision?.rows.filter((r) => showDropped || r.retained) || [];
+  const retainedCount = decision?.rows.filter((r) => r.retained).length || 0;
+  const omittedCandidates =
+    result?.snapshot.candidates.filter((candidate) =>
+      result.shortlist.omittedIds.includes(candidate.id),
+    ) || [];
+  const excludedCandidates =
+    snapshot?.candidates.filter((candidate) =>
+      excluded.includes(candidate.id),
+    ) || [];
+  const likedCandidates =
+    snapshot?.candidates.filter((candidate) => liked.includes(candidate.id)) ||
+    [];
   const scope =
     sources.length &&
     sources.every((s) => ["crossref", "europepmc"].includes(s))
@@ -205,10 +255,13 @@ export function SearchLab({
         JSON.stringify(snapshot.lanes.map((l) => l.source)));
   const changed =
     result &&
-    ((intent.trim() || query.trim()) !== result.intent ||
-      threshold !== result.threshold ||
-      JSON.stringify(liked) !== JSON.stringify(result.liked) ||
-      JSON.stringify(excluded) !== JSON.stringify(result.excluded));
+    searchPreferencesChanged(result, {
+      intent: intent.trim() || query.trim(),
+      liked,
+      excluded,
+      providers,
+      shortlistSize,
+    });
   return (
     <div className={`search-lab ${snapshot ? "has-results" : "is-empty"}`}>
       <div className="search-heading">
@@ -216,8 +269,7 @@ export function SearchLab({
           <span className="eyebrow">A SMALL INTENTION. A WORLD TO FIND.</span>
           <h1>
             {shopping ? "少一点挑选，" : "拾一份心意，"}
-            <br />
-            {shopping ? "找到真正想买的" : "发现下一种可能"}
+            <br /> {shopping ? "找到真正想买的" : "发现下一种可能"}
             <span className="artist-mark">✳</span>
           </h1>
           <p>
@@ -326,6 +378,7 @@ export function SearchLab({
                 : providerNames[providers[0]]
               : `${providers.length} 个模型对照`}
           </span>
+          <span>{shortlistSize === null ? "全部候选精排" : "快速短名单"}</span>
         </div>
         {shopping && (
           <div className="store-links">
@@ -443,6 +496,35 @@ export function SearchLab({
               <ArrowUpRight size={15} />
             </button>
           </div>
+          <fieldset className="search-shortlist-control">
+            <legend>精排范围</legend>
+            <div
+              className="search-shortlist-options"
+              role="group"
+              aria-label="精排范围"
+            >
+              <button
+                type="button"
+                aria-pressed={shortlistSize === 24}
+                disabled={busy}
+                onClick={() => setShortlistSize(24)}
+              >
+                快速短名单 <small>24</small>
+              </button>
+              <button
+                type="button"
+                aria-pressed={shortlistSize === null}
+                disabled={busy}
+                onClick={() => setShortlistSize(null)}
+              >
+                全部候选
+              </button>
+            </div>
+            <p>
+              先融合来源排名与关键词匹配，再精排短名单。喜欢的结果优先保留，数量可能超过
+              24；其余候选仍可展开查看。
+            </p>
+          </fieldset>
           <div className="search-tuning">
             <label>
               每源候选数
@@ -468,10 +550,13 @@ export function SearchLab({
                 onChange={(e) => setThreshold(Number(e.target.value))}
                 disabled={busy}
               />
+              <small>即时筛选，不重新调用模型</small>
             </label>
             <button
               className="secondary"
-              disabled={busy || !snapshot}
+              disabled={
+                busy || !snapshot || !!searchChanged || !providers.length
+              }
               onClick={() => void run(false)}
             >
               <RefreshCw size={14} />
@@ -494,6 +579,7 @@ export function SearchLab({
                     setKeySource(e.target.value as typeof keySource);
                     setKey("");
                   }}
+                  disabled={busy}
                 >
                   <option value="tavily">Tavily</option>
                   <option value="search1api">Search1API</option>
@@ -508,12 +594,21 @@ export function SearchLab({
                   aria-label="搜索 API Key"
                   value={key}
                   onChange={(e) => setKey(e.target.value)}
+                  disabled={busy}
                 />
               </label>
-              <button className="primary" onClick={() => void saveKey()}>
+              <button
+                className="primary"
+                disabled={busy}
+                onClick={() => void saveKey()}
+              >
                 保存搜索连接
               </button>
-              <button className="secondary" onClick={() => void saveKey(true)}>
+              <button
+                className="secondary"
+                disabled={busy}
+                onClick={() => void saveKey(true)}
+              >
                 清除连接
               </button>
               <p>
@@ -550,6 +645,9 @@ export function SearchLab({
       {error && (
         <div className="error" role="alert">
           {error}
+          {errorDetails.map((detail, index) => (
+            <p key={index}>{detail}</p>
+          ))}
         </div>
       )}
       {busy && (
@@ -564,7 +662,7 @@ export function SearchLab({
           <small>
             {stage === "search"
               ? "并行检索、清理链接、合并重复来源"
-              : "各引擎按相同候选顺序执行；等待真实响应"}
+              : "各引擎使用同一短名单；优先复用有效评分"}
           </small>
         </div>
       )}
@@ -629,10 +727,16 @@ export function SearchLab({
             <summary>
               <Activity size={15} />
               查看决策过程
-              <span>
-                {snapshot.candidates.length} 个候选 · 搜索{" "}
-                {ms(snapshot.searchMs)}
-                {result ? ` · 评分 ${ms(result.rankingMs)}` : ""}
+              <span className="search-flow-summary">
+                <span>{snapshot.candidates.length} 真实候选</span>
+                {result && (
+                  <>
+                    <i>→</i>
+                    <span>{result.shortlist.selected} 入选</span>
+                    <i>→</i>
+                    <span>{decision?.error ? "—" : retainedCount} 保留</span>
+                  </>
+                )}
               </span>
               <b>＋</b>
             </summary>
@@ -647,7 +751,16 @@ export function SearchLab({
                   <button
                     className="text-btn"
                     disabled={!result}
-                    onClick={() => saveJSON(result)}
+                    onClick={() =>
+                      result &&
+                      saveJSON(
+                        searchEvidenceExport(result, threshold, {
+                          selectedProvider: selected,
+                          includeBelowThreshold: showDropped,
+                          pendingChanges: !!(searchChanged || changed),
+                        }),
+                      )
+                    }
                   >
                     导出完整证据
                     <Download size={14} />
@@ -658,29 +771,55 @@ export function SearchLab({
                 <div>
                   <span>真实候选</span>
                   <strong>{snapshot.candidates.length}</strong>
-                  <small>按 URL 去重后</small>
+                  <small>联网耗时 {ms(snapshot.searchMs)}</small>
                 </div>
                 <div>
-                  <span>联网耗时</span>
-                  <strong>{ms(snapshot.searchMs)}</strong>
-                  <small>含来源请求与去重</small>
+                  <span>进入精排</span>
+                  <strong>{result ? result.shortlist.selected : "—"}</strong>
+                  <small>
+                    短名单筛选 {result ? ms(result.shortlist.ms) : "—"}
+                  </small>
                 </div>
                 <div>
                   <span>本轮评分耗时</span>
                   <strong>{result ? ms(result.rankingMs) : "—"}</strong>
-                  <small>多模型按顺序执行</small>
+                  <small>
+                    本轮模型请求{" "}
+                    {result && result.decisions.every((d) => d.calls !== null)
+                      ? result.decisions.reduce(
+                          (sum, d) => sum + (d.calls || 0),
+                          0,
+                        )
+                      : "—"}
+                  </small>
                 </div>
                 <div>
                   <span>当前引擎保留</span>
                   <strong>
-                    {decision && !decision.error
-                      ? decision.rows.filter((r) => r.retained).length
-                      : "—"}
-                    <em> / {snapshot.candidates.length}</em>
+                    {decision && !decision.error ? retainedCount : "—"}
+                    <em>
+                      {" "}
+                      /{" "}
+                      {result?.shortlist.selected ?? snapshot.candidates.length}
+                    </em>
                   </strong>
-                  <small>低分结果仍可展开</small>
+                  <small>即时阈值 {Math.round(threshold * 100)}%</small>
                 </div>
               </div>
+              {result && (
+                <div className="search-shortlist-note">
+                  <p>
+                    {result.shortlist.limit === null
+                      ? "本轮对全部可用候选评分。"
+                      : "来源排名融合与关键词匹配先筛选，再由所选引擎评分。"}{" "}
+                    已排除 {result.shortlist.excludedIds.length} · 未入选{" "}
+                    {result.shortlist.omittedIds.length}
+                  </p>
+                  <p>
+                    短名单筛选可能遗漏相关结果；可展开其余候选，或切换全部候选。来源摘要用于判断，未核验网页全文。
+                  </p>
+                </div>
+              )}
               <div className="decision-panels">
                 <div className="decision-panel">
                   <h3>搜索来源与耗时</h3>
@@ -721,18 +860,50 @@ export function SearchLab({
                         />
                       </div>
                       <small>
-                        {d.error ||
-                          `${d.model} · ${d.calls} 次请求 · ${d.rows.length * 2} 项评分`}
+                        {d.error || (
+                          <span>
+                            <span translate="no">{d.model}</span> · 本轮请求{" "}
+                            {d.calls === null ? "—" : d.calls} · 已评分候选{" "}
+                            {d.rows.length}
+                          </span>
+                        )}
                       </small>
+                      {d.cache?.hit && (
+                        <small className="search-cache-note">
+                          <Check size={10} />
+                          复用已有评分 · 首次评分 {ms(d.cache.originalMs)} ·
+                          原始请求 {d.cache.originalCalls}
+                          <time dateTime={d.cache.scoredAt}>
+                            {new Date(d.cache.scoredAt).toLocaleTimeString(
+                              locale === "en" ? "en-US" : "zh-CN",
+                            )}
+                          </time>
+                        </small>
+                      )}
                     </div>
                   )) || <p>等待评分</p>}
                 </div>
               </div>
+              {result && (
+                <div className="search-score-refresh">
+                  <p>
+                    阈值在页面即时生效；相同需求与反馈可复用评分。导出同时保留当前筛选与原始评分记录。
+                  </p>
+                  <button
+                    className="text-btn"
+                    disabled={busy || !!searchChanged || !providers.length}
+                    onClick={() => void run(false, true)}
+                  >
+                    <RefreshCw size={13} />
+                    重新请求评分
+                  </button>
+                </div>
+              )}
               {history.length > 1 && (
                 <div className="decision-history">
                   <span>最近 {history.length} 轮</span>
                   {history.map((h, i) => (
-                    <div key={i} title={`${h.label} ${ms(h.ms)}`}>
+                    <div key={i} title={`${t(h.label)} ${ms(h.ms)}`}>
                       <i
                         style={{
                           height: `${Math.max(5, (h.ms / Math.max(...history.map((x) => x.ms))) * 48)}px`,
@@ -776,8 +947,9 @@ export function SearchLab({
                     type="checkbox"
                     checked={showDropped}
                     onChange={(e) => setShowDropped(e.target.checked)}
+                    disabled={busy}
                   />
-                  包含低分与已排除
+                  包含低于阈值的结果
                 </label>
               </div>
               <div className="search-result-tabs">
@@ -786,6 +958,7 @@ export function SearchLab({
                     key={d.provider}
                     className={selected === d.provider ? "active" : ""}
                     onClick={() => setSelected(d.provider)}
+                    disabled={busy}
                   >
                     {d.provider === "baseline"
                       ? "关键词基线"
@@ -796,19 +969,80 @@ export function SearchLab({
               </div>
               {changed && (
                 <p className="search-pending">
-                  偏好已修改。点击“按新偏好重新评分”后生效；下方保留上一轮结果。
+                  需求、反馈、引擎或精排范围已修改。重新匹配后生效；下方保留上一轮评分。
                 </p>
               )}
               <div className="search-refine">
                 <button
                   className="text-btn"
-                  disabled={busy}
+                  disabled={busy || !!searchChanged || !providers.length}
                   onClick={() => void run(false)}
                 >
                   <RefreshCw size={13} />
                   按反馈重新匹配
                 </button>
               </div>
+              {(likedCandidates.length > 0 ||
+                excludedCandidates.length > 0) && (
+                <details className="search-feedback-list" open>
+                  <summary>
+                    你的偏好{" "}
+                    <span>
+                      {likedCandidates.length + excludedCandidates.length}
+                    </span>
+                  </summary>
+                  <p>反馈在重新匹配后生效；已排除的结果可在这里恢复。</p>
+                  {likedCandidates.map((candidate) => (
+                    <div className="search-feedback-entry" key={candidate.id}>
+                      <Heart size={13} />
+                      <a
+                        href={candidate.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        translate="no"
+                      >
+                        {candidate.title}
+                      </a>
+                      <button
+                        className="text-btn"
+                        disabled={busy}
+                        onClick={() =>
+                          setLiked(liked.filter((id) => id !== candidate.id))
+                        }
+                      >
+                        取消喜欢
+                      </button>
+                    </div>
+                  ))}
+                  {excludedCandidates.map((candidate) => (
+                    <div
+                      className="search-feedback-entry excluded"
+                      key={candidate.id}
+                    >
+                      <Ban size={13} />
+                      <a
+                        href={candidate.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        translate="no"
+                      >
+                        {candidate.title}
+                      </a>
+                      <button
+                        className="text-btn"
+                        disabled={busy}
+                        onClick={() =>
+                          setExcluded(
+                            excluded.filter((id) => id !== candidate.id),
+                          )
+                        }
+                      >
+                        撤销排除
+                      </button>
+                    </div>
+                  ))}
+                </details>
+              )}
               <p className="search-note">
                 当前分数 = 70% 相关性 + 30%
                 需求契合；关键词基线仅按文本重合度计算。模型分数与 Jev
@@ -819,7 +1053,7 @@ export function SearchLab({
                 <div className="error">{decision.error}</div>
               ) : !rows.length ? (
                 <div className="search-empty compact">
-                  当前没有达到阈值的结果。可展开低分候选，或调整需求与阈值后重评。
+                  当前没有达到阈值的结果。降低阈值可即时查看；改变需求后请重新匹配。
                 </div>
               ) : (
                 rows.map((r) => (
@@ -930,6 +1164,86 @@ export function SearchLab({
                     </div>
                   </article>
                 ))
+              )}
+              {omittedCandidates.length > 0 && (
+                <details className="search-omitted">
+                  <summary>
+                    查看未入选候选 <span>{omittedCandidates.length}</span>
+                    <b>＋</b>
+                  </summary>
+                  <p>
+                    这些结果尚未评分。喜欢其中一项，可让它进入下一轮精排；不会凭空补上分数。
+                  </p>
+                  {omittedCandidates.map((candidate) => (
+                    <article
+                      className="search-omitted-result"
+                      key={candidate.id}
+                    >
+                      <div>
+                        <small>
+                          {candidate.sources
+                            .map((source) => t(sourceNames[source]))
+                            .join(" · ")}
+                        </small>
+                        <h3>
+                          <a
+                            href={candidate.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            translate="no"
+                          >
+                            {candidate.title}
+                            <ArrowUpRight size={13} />
+                          </a>
+                        </h3>
+                        {candidate.snippet && (
+                          <p translate="no">
+                            {candidate.snippet.length > 220
+                              ? candidate.snippet.slice(0, 220) + "…"
+                              : candidate.snippet}
+                          </p>
+                        )}
+                        <div className="search-feedback">
+                          <button
+                            className={
+                              liked.includes(candidate.id) ? "active" : ""
+                            }
+                            disabled={busy}
+                            onClick={() => {
+                              setLiked(toggle(liked, candidate.id));
+                              setExcluded(
+                                excluded.filter((id) => id !== candidate.id),
+                              );
+                            }}
+                          >
+                            <Heart size={13} />
+                            {liked.includes(candidate.id)
+                              ? "下轮优先匹配"
+                              : "喜欢，加入下轮"}
+                          </button>
+                          <button
+                            className={
+                              excluded.includes(candidate.id) ? "active" : ""
+                            }
+                            disabled={busy}
+                            onClick={() => {
+                              setExcluded(toggle(excluded, candidate.id));
+                              setLiked(
+                                liked.filter((id) => id !== candidate.id),
+                              );
+                            }}
+                          >
+                            <Ban size={13} />
+                            {excluded.includes(candidate.id)
+                              ? "撤销排除"
+                              : "不符合需求"}
+                          </button>
+                        </div>
+                      </div>
+                      <span className="search-unscored">尚未评分</span>
+                    </article>
+                  ))}
+                </details>
               )}
               <p className="search-note">
                 候选快照：

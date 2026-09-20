@@ -702,6 +702,7 @@ export default function App() {
                 shopping
                 profiles={status.profiles}
                 onModelSettings={() => setSettings(true)}
+                onStatusRefresh={refreshStatus}
               />
             )}
             {page === "discover" && shoppingMode === "demo" && (
@@ -1478,6 +1479,7 @@ export default function App() {
               <SearchLab
                 profiles={status.profiles}
                 onModelSettings={() => setSettings(true)}
+                onStatusRefresh={refreshStatus}
               />
             </div>
             {page === "research" && <Sources />}

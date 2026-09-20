@@ -29,6 +29,8 @@ export type SearchCandidate = {
   snippet: string;
   sources: SearchSource[];
   originalRank: number;
+  /** Upstream positions before invalid/duplicate results are removed. */
+  sourceRanks?: Partial<Record<SearchSource, number>>;
   extra?: string;
   paper?: {
     authors: string;
@@ -71,6 +73,25 @@ export type SearchDecision = {
   usage: Run["usage"];
   rawAnswers: unknown;
   error: string | null;
+  /** Original scoring provenance, separate from this request's ms/calls/usage. */
+  cache?: {
+    hit: boolean;
+    scoredAt: string;
+    originalMs: number;
+    originalCalls: number;
+    originalUsage: Run["usage"];
+  };
+};
+export type SearchShortlist = {
+  /** Requested cap; explicit likes can raise the actual selected count. */
+  limit: number | null;
+  total: number;
+  eligible: number;
+  selected: number;
+  excludedIds: string[];
+  omittedIds: string[];
+  method: "rrf-60+lexical-v1";
+  ms: number;
 };
 export type SearchResult = {
   snapshot: SearchSnapshot;
@@ -79,6 +100,7 @@ export type SearchResult = {
   liked: string[];
   excluded: string[];
   decisions: SearchDecision[];
+  shortlist: SearchShortlist;
   rankingMs: number;
   createdAt: string;
   scoring: string;
