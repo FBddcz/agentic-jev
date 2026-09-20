@@ -1,4 +1,4 @@
-name: Check RecJev
+name: Check AgenticJev
 on: [push, pull_request]
 permissions:
   contents: read

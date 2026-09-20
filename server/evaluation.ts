@@ -1,6 +1,26 @@
-import { defaultConfig, missions, products } from "../src/data";
+import fixtureCatalog from "./fixtures/catalog-v1.json";
+import fixtureSettings from "./fixtures/algorithm-v1.json";
+import { validateCatalog } from "../src/catalog";
+import { validateAlgorithmSettings } from "../src/settings";
 import type { Evaluation, Config } from "../src/types";
-import { generate, VERSION, type Decider } from "./engine";
+import { createEngine, type Decider } from "./engine";
+
+// These snapshots are intentionally independent of the editable application files.
+const { missions, products } = validateCatalog(fixtureCatalog);
+const settings = validateAlgorithmSettings(fixtureSettings);
+const evaluationEngine = createEngine(fixtureCatalog, fixtureSettings);
+const { generate } = evaluationEngine;
+const VERSION = "recjev-v0.1-catalog1-rubric1";
+const defaultConfig: Config = {
+  query: missions[0].query,
+  mission: missions[0].id,
+  budget: missions[0].budget,
+  ...settings.defaults,
+  provider: "baseline",
+  likes: [],
+  dislikes: [],
+  locked: [],
+};
 
 // Fixed, manually specified synthetic judgments, held outside scorer inputs.
 // Designed to exercise constraint handling; not a representative benchmark.
@@ -113,6 +133,7 @@ export async function evaluate(
             query: m.query,
             mission: m.id,
             budget,
+            maxItems: 4,
             provider,
             ads: false,
           },
@@ -176,6 +197,7 @@ export async function evaluate(
     metrics,
     rows,
     version: VERSION,
-    note: "12 个固定合成场景（4 场景 × 3 预算）。偏好标签人工设定且不输入评分器；效用 = 0.5 × 标签效用 + 0.5 × 需求覆盖。95% bootstrap 区间只描述此小样本，不代表真实用户。两策略共享一次评分结果与端到端延迟；种子只控制 bootstrap。无真实 CTR、GMV 或线上 A/B 结论。",
+    engine: structuredClone(evaluationEngine.provenance),
+    note: "12 个固定合成场景（4 场景 × 3 预算），使用独立商品与参数快照，不受应用自定义配置影响。偏好标签人工设定且不输入评分器；效用 = 0.5 × 标签效用 + 0.5 × 需求覆盖。95% bootstrap 区间只描述此小样本，不代表真实用户。两策略共享一次评分结果与端到端延迟；种子只控制 bootstrap。无真实 CTR、GMV 或线上 A/B 结论。",
   };
 }

@@ -1,0 +1,43 @@
+{
+  "version": "rubric1",
+  "defaults": {
+    "maxItems": 4,
+    "diversity": 0.72,
+    "ads": true,
+    "adWeight": 0.35
+  },
+  "retrieval": {
+    "limit": 24,
+    "sceneBoost": 0.7,
+    "bm25K1": 1.2,
+    "bm25B": 0.75
+  },
+  "baseline": {
+    "relevanceBase": 0.08,
+    "missionWeight": 0.52,
+    "lexicalWeight": 0.3,
+    "affinityBase": 0.45,
+    "qualityWeight": 0.25,
+    "likeWeight": 0.24,
+    "dislikeWeight": 0.2,
+    "directLikeBoost": 0.12
+  },
+  "ranking": {
+    "relevanceWeight": 0.68,
+    "affinityWeight": 0.22,
+    "qualityWeight": 0.1,
+    "minRelevance": 0.24
+  },
+  "slate": {
+    "beamWidth": 40,
+    "coverageReward": 0.8,
+    "repeatPenalty": 0.65,
+    "searchBudget": 50000
+  },
+  "advertising": {
+    "minRelevance": 0.55,
+    "baseCtr": 0.025,
+    "qualityCtrWeight": 0.035,
+    "minCpc": 0.05
+  }
+}

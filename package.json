@@ -1,7 +1,7 @@
 {
-  "name": "rec-jev",
+  "name": "agentic-jev",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.3.0",
   "type": "module",
   "engines": {
     "node": ">=22.12"
@@ -18,12 +18,14 @@
     "@typesafe-ai/sdk": "0.6.0",
     "lucide-react": "^0.468.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "three": "^0.186.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/three": "^0.186.0",
     "@vitejs/plugin-react": "^4.3.4",
     "prettier": "^3.6.2",
     "tsx": "^4.19.2",

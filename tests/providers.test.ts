@@ -108,6 +108,7 @@ for (const provider of ["openai", "claude", "minicpm"] as const)
       items,
       lexical,
       "camp",
+      { liked: [], disliked: [] },
     );
     assert.equal(result.calls, 1);
     assert.equal(result.usage?.input_tokens, 300);
@@ -142,7 +143,7 @@ test("upstream errors remain errors and do not echo provider bodies", async () =
       new Response("sensitive-provider-body", { status: 401 })) as typeof fetch,
   );
   await assert.rejects(
-    decider(defaultConfig, items, lexical, "camp"),
+    decider(defaultConfig, items, lexical, "camp", { liked: [], disliked: [] }),
     (e) =>
       e instanceof Error &&
       e.message.includes("401") &&

@@ -27,10 +27,12 @@ def questions(state):
     if len(ids) != len(items) or any(not isinstance(i, str) for i in ids) or len(set(ids)) != len(ids):
         raise ValueError("Unique candidate IDs are required")
     rows = []
+    purpose = "search intent" if state.get("domain") == "search" else "shopping intent"
+    preference = "needs" if state.get("domain") == "search" else "style"
     for i, product in enumerate(items):
         rows.extend([
-            (product["id"], "relevance", f"Is candidates[{i}] useful for the shopping intent in query? A: No. B: Yes.", [0, 1]),
-            (product["id"], "affinity", f"How does candidates[{i}] fit the expressed style and liked/disliked items? A: Conflicts. B: Neutral or no preference evidence. C: Strong fit.", [0, .5, 1]),
+            (product["id"], "relevance", f"Is candidates[{i}] useful for the {purpose} in query? A: No. B: Yes.", [0, 1]),
+            (product["id"], "affinity", f"How does candidates[{i}] fit the expressed {preference} and liked/disliked items? A: Conflicts. B: Neutral or no preference evidence. C: Strong fit.", [0, .5, 1]),
         ])
     return rows
 

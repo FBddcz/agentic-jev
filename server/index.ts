@@ -9,8 +9,9 @@ import { fileURLToPath } from "node:url";
 import { dirname, join, resolve, extname } from "node:path";
 import { createServer as createViteServer } from "vite";
 import { APIError, APITimeoutError } from "@typesafe-ai/sdk";
-import { generate } from "./engine";
+import { generate, replaceItem, validateConfig } from "./engine";
 import { createJevDecider } from "./jev";
+import { batchDecider } from "./batched";
 import { evaluate } from "./evaluation";
 import {
   createCompatibleDecider,
@@ -18,6 +19,20 @@ import {
   type Connection,
 } from "./providers";
 import type { Provider } from "../src/types";
+import {
+  retrieveSearch,
+  rankSearch,
+  SearchStore,
+  type SearchKeys,
+} from "./search";
+import { recommendScene } from "./scene";
+import { runTryOn, tryOnStatus } from "./tryon";
+const searchStore = new SearchStore();
+const searchKeys: SearchKeys = {
+  tavily: process.env.TAVILY_API_KEY,
+  search1api: process.env.SEARCH1API_API_KEY,
+  brave: process.env.BRAVE_SEARCH_API_KEY,
+};
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const port = Number(process.env.PORT || 8787),
   dev = process.argv.includes("--dev");
@@ -27,17 +42,31 @@ let apiKey = process.env.TYPESAFE_API_KEY || "",
   busy = false;
 const connections: Partial<Record<Provider, Connection>> = {};
 const verifiedProfiles = new Set<Provider>();
-function deciderFor(provider: Provider) {
+function deciderFor(
+  provider: Provider,
+  domain: "shopping" | "search" = "shopping",
+) {
   return provider === "jev"
     ? apiKey
-      ? createJevDecider(apiKey, model)
+      ? batchDecider(createJevDecider(apiKey, model, domain))
       : undefined
     : connections[provider]
-      ? createCompatibleDecider(connections[provider]!)
+      ? batchDecider(
+          createCompatibleDecider(connections[provider]!, fetch, domain),
+        )
       : undefined;
 }
 function status() {
   return {
+    searchSources: {
+      github: true,
+      hackernews: true,
+      crossref: true,
+      europepmc: true,
+      tavily: !!searchKeys.tavily,
+      search1api: !!searchKeys.search1api,
+      brave: !!searchKeys.brave,
+    },
     configured: !!apiKey,
     verified,
     model,
@@ -80,12 +109,12 @@ const send = (res: ServerResponse, status: number, data: unknown) => {
   });
   res.end(JSON.stringify(data));
 };
-async function body(req: IncomingMessage): Promise<any> {
+async function body(req: IncomingMessage, limit = 32000): Promise<any> {
   let length = 0;
   const chunks: Buffer[] = [];
   for await (const data of req) {
     length += data.length;
-    if (length > 32000) throw new Error("请求过大。");
+    if (length > limit) throw new Error("请求过大。");
     chunks.push(data);
   }
   try {
@@ -109,6 +138,8 @@ const server = createServer(async (req, res) => {
       return send(res, 403, { error: "拒绝跨站请求。" });
     if (req.method === "GET" && path === "/api/status")
       return send(res, 200, { ...status(), busy });
+    if (req.method === "GET" && path === "/api/tryon/status")
+      return send(res, 200, await tryOnStatus());
     if (
       req.method !== "POST" ||
       !String(req.headers["content-type"]).startsWith("application/json")
@@ -118,9 +149,61 @@ const server = createServer(async (req, res) => {
       return send(res, 409, { error: "另一个实验正在运行，请稍后再试。" });
     let ownsBusy = false;
     try {
-      const data = await body(req);
+      const data = await body(
+        req,
+        path === "/api/tryon/run" ? 12 * 1024 * 1024 : 32000,
+      );
       if (busy)
         return send(res, 409, { error: "另一个实验正在运行，请稍后再试。" });
+      if (path === "/api/tryon/run") {
+        busy = true;
+        ownsBusy = true;
+        return send(res, 200, await runTryOn(data));
+      }
+      if (path === "/api/scene/recommend") {
+        busy = true;
+        ownsBusy = true;
+        return send(
+          res,
+          200,
+          await recommendScene(data, (p) => deciderFor(p, "search")),
+        );
+      }
+      if (path === "/api/search/connect") {
+        if (!["tavily", "brave", "search1api"].includes(data.source))
+          throw new Error("未知搜索来源。");
+        const source = data.source as keyof SearchKeys;
+        if (data.clear === true) delete searchKeys[source];
+        else {
+          if (
+            typeof data.key !== "string" ||
+            !data.key.trim() ||
+            data.key.length > 2048
+          )
+            throw new Error("请填写有效搜索 Key。");
+          searchKeys[source] = data.key.trim();
+        }
+        return send(res, 200, status());
+      }
+      if (path === "/api/search/retrieve") {
+        busy = true;
+        ownsBusy = true;
+        const snapshot = await retrieveSearch(data, searchKeys);
+        searchStore.add(snapshot);
+        return send(res, 200, snapshot);
+      }
+      if (path === "/api/search/rank") {
+        busy = true;
+        ownsBusy = true;
+        const snapshot = searchStore.get(data.snapshotId);
+        return send(
+          res,
+          200,
+          await rankSearch(snapshot, data, (p) => deciderFor(p, "search")),
+        );
+      }
+      if (path === "/api/validate-config")
+        return send(res, 200, { config: validateConfig(data) });
       if (path === "/api/connect") {
         if (data.provider && data.provider !== "jev") {
           if (!["openai", "claude", "minicpm"].includes(data.provider))
@@ -156,6 +239,15 @@ const server = createServer(async (req, res) => {
         model = data.model;
         verified = false;
         return send(res, 200, status());
+      }
+      if (path === "/api/replace") {
+        busy = true;
+        ownsBusy = true;
+        return send(
+          res,
+          200,
+          await replaceItem(data, deciderFor(data.config?.provider)),
+        );
       }
       if (path === "/api/generate") {
         busy = true;
@@ -305,7 +397,7 @@ const server = createServer(async (req, res) => {
 });
 server.listen(port, "127.0.0.1", () =>
   console.log(
-    `RecJev · 拾意 → http://127.0.0.1:${port} (${dev ? "dev" : "production"})`,
+    `AgenticJev · 拾意 → http://127.0.0.1:${port} (${dev ? "dev" : "production"})`,
   ),
 );
 process.on("SIGTERM", () => server.close());

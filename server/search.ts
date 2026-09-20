@@ -1,0 +1,641 @@
+import { createHash, randomUUID } from "node:crypto";
+import type { Config, Product, Provider } from "../src/types";
+import {
+  sourceNames,
+  type ShoppingMarket,
+  type SearchCandidate,
+  type SearchSource,
+  type SearchSnapshot,
+  type SearchResult,
+  type SearchDecision,
+} from "../src/search-types";
+import type { Decider } from "./engine";
+
+const SOURCES = Object.keys(sourceNames) as SearchSource[];
+const MODELS: Provider[] = ["baseline", "jev", "openai", "claude", "minicpm"];
+export type SearchKeys = Partial<
+  Record<"tavily" | "brave" | "search1api", string>
+>;
+function string(value: unknown, name: string, max: number) {
+  if (typeof value !== "string" || !value.trim() || value.length > max)
+    throw new Error(`${name} 需为 1–${max} 字符。`);
+  return value.trim();
+}
+export function validateSearch(input: any) {
+  const query = string(input?.query, "搜索词", 500);
+  if (
+    !Array.isArray(input.sources) ||
+    !input.sources.length ||
+    input.sources.length > SOURCES.length ||
+    new Set(input.sources).size !== input.sources.length ||
+    input.sources.some((s: any) => !SOURCES.includes(s))
+  )
+    throw new Error("请选择有效且不重复的搜索来源。");
+  if (!Number.isInteger(input.limit) || input.limit < 1 || input.limit > 100)
+    throw new Error("每个来源可取 1–100 条；受上游接口返回量限制。");
+  if (
+    input.market !== undefined &&
+    (!["amazon", "taobao", "jd"].includes(input.market) ||
+      input.sources.some(
+        (s: string) => !["tavily", "brave", "search1api"].includes(s),
+      ))
+  )
+    throw new Error("真实商品检索请选择有效平台和全网搜索来源。");
+  return {
+    market: input.market as ShoppingMarket | undefined,
+    query,
+    sources: input.sources as SearchSource[],
+    limit: input.limit as number,
+  };
+}
+const plain = (s: unknown, max: number) =>
+  typeof s === "string"
+    ? s
+        .replace(
+          /&(?:lt|gt|amp|quot|apos|nbsp);|&#(x[0-9a-f]+|\d+);/gi,
+          (entity, numeric) => {
+            if (numeric) {
+              const n =
+                numeric[0].toLowerCase() === "x"
+                  ? parseInt(numeric.slice(1), 16)
+                  : Number(numeric);
+              return n > 0 && n <= 0x10ffff ? String.fromCodePoint(n) : " ";
+            }
+            return (
+              (
+                {
+                  "&lt;": "<",
+                  "&gt;": ">",
+                  "&amp;": "&",
+                  "&quot;": '\"',
+                  "&apos;": "'",
+                  "&nbsp;": " ",
+                } as Record<string, string>
+              )[entity.toLowerCase()] || entity
+            );
+          },
+        )
+        .replace(/<[^>]*>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, max)
+    : "";
+export function canonicalUrl(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  try {
+    const u = new URL(raw);
+    if (!["http:", "https:"].includes(u.protocol) || u.username || u.password)
+      return null;
+    u.hash = "";
+    if (["doi.org", "dx.doi.org"].includes(u.hostname)) {
+      u.protocol = "https:";
+      u.hostname = "doi.org";
+      u.pathname = u.pathname.toLowerCase();
+      u.search = "";
+    }
+    for (const k of [...u.searchParams.keys()])
+      if (/^(utm_|fbclid$|gclid$)/i.test(k)) u.searchParams.delete(k);
+    u.searchParams.sort();
+    return u.href;
+  } catch {
+    return null;
+  }
+}
+type Raw = {
+  title: unknown;
+  url: unknown;
+  snippet: unknown;
+  extra?: string;
+  paper?: SearchCandidate["paper"];
+};
+export function normalizeResults(
+  rows: Raw[],
+  source: SearchSource,
+  limit: number,
+): SearchCandidate[] {
+  const out: SearchCandidate[] = [];
+  const seen = new Set<string>();
+  for (const row of rows) {
+    const url = canonicalUrl(row.url),
+      title = plain(row.title, 300);
+    if (!url || !title || seen.has(url)) continue;
+    seen.add(url);
+    out.push({
+      id: "r" + createHash("sha256").update(url).digest("hex").slice(0, 20),
+      title,
+      url,
+      snippet: plain(row.snippet, 1800),
+      sources: [source],
+      originalRank: out.length + 1,
+      extra: row.extra,
+      ...(row.paper ? { paper: row.paper } : {}),
+    });
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+async function lane(
+  source: SearchSource,
+  query: string,
+  limit: number,
+  keys: SearchKeys,
+  fetcher: typeof fetch,
+) {
+  let url: string,
+    init: RequestInit = {
+      headers: {
+        "User-Agent": "AgenticJev/0.3 (research search client)",
+        Accept: "application/json",
+      },
+      redirect: "error",
+      signal: AbortSignal.timeout(15000),
+    };
+  if (source === "github")
+    url = `https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&per_page=${limit}`;
+  else if (source === "hackernews")
+    url = `https://hn.algolia.com/api/v1/search?tags=story&query=${encodeURIComponent(query)}&hitsPerPage=${limit}`;
+  else if (source === "crossref")
+    url = `https://api.crossref.org/works?query.bibliographic=${encodeURIComponent(query)}&rows=${limit}&filter=type:journal-article,type:proceedings-article,type:posted-content`;
+  else if (source === "europepmc")
+    url = `https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=${encodeURIComponent(query)}&format=json&resultType=core&pageSize=${limit}`;
+  else {
+    if (!keys[source])
+      throw new Error(`${sourceNames[source]} 尚未配置搜索 Key。`);
+    if (source === "tavily") {
+      url = "https://api.tavily.com/search";
+      init = {
+        ...init,
+        method: "POST",
+        headers: {
+          ...init.headers,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${keys.tavily}`,
+        },
+        body: JSON.stringify({
+          query,
+          search_depth: "basic",
+          auto_parameters: false,
+          max_results: Math.min(limit, 20),
+          include_answer: false,
+          include_raw_content: false,
+        }),
+      };
+    } else if (source === "brave") {
+      url = `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=${Math.min(limit, 20)}`;
+      init.headers = { ...init.headers, "X-Subscription-Token": keys.brave! };
+    } else {
+      url = "https://api.search1api.com/search";
+      init = {
+        ...init,
+        method: "POST",
+        headers: {
+          ...init.headers,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${keys.search1api}`,
+        },
+        body: JSON.stringify({
+          query,
+          search_service: "google",
+          max_results: limit,
+        }),
+      };
+    }
+  }
+  let response: Response;
+  try {
+    response = await fetcher(url, init);
+  } catch {
+    throw new Error(`${sourceNames[source]} 网络连接失败或超过 15 秒。`);
+  }
+  if (!response.ok)
+    throw new Error(
+      `${sourceNames[source]} 返回 HTTP ${response.status}${response.status === 429 || response.status === 403 ? "，请检查配额或稍后重试" : ""}。`,
+    );
+  const body = await response.json();
+  let rows: Raw[];
+  if (source === "github") {
+    if (!Array.isArray(body.items))
+      throw new Error("GitHub 搜索响应格式不完整。");
+    rows = body.items.map((p: any) => ({
+      title: p.full_name,
+      url: p.html_url,
+      snippet: p.description,
+      extra: `${p.language || "未标记语言"} · ★ ${Number(p.stargazers_count) || 0} · ${p.license?.spdx_id || "许可未标记"}`,
+    }));
+  } else if (source === "hackernews") {
+    if (!Array.isArray(body.hits))
+      throw new Error("Hacker News 搜索响应格式不完整。");
+    rows = body.hits.map((p: any) => ({
+      title: p.title,
+      url:
+        p.url ||
+        `https://news.ycombinator.com/item?id=${encodeURIComponent(p.objectID)}`,
+      snippet: p.story_text || p.title,
+      extra: `${Number(p.points) || 0} 分 · ${Number(p.num_comments) || 0} 条讨论`,
+    }));
+  } else if (source === "crossref") {
+    if (!Array.isArray(body.message?.items))
+      throw new Error("Crossref 响应格式不完整。");
+    rows = body.message.items.map((p: any) => {
+      const doi = plain(p.DOI, 300).toLowerCase();
+      const year = Number(p.published?.["date-parts"]?.[0]?.[0]);
+      return {
+        title: Array.isArray(p.title) ? p.title[0] : p.title,
+        url: doi ? `https://doi.org/${doi}` : p.URL,
+        snippet: p.abstract,
+        paper: {
+          authors: Array.isArray(p.author)
+            ? p.author
+                .slice(0, 6)
+                .map((a: any) =>
+                  plain(
+                    [a.given, a.family].filter(Boolean).join(" ") || a.name,
+                    150,
+                  ),
+                )
+                .filter(Boolean)
+                .join(", ") + (p.author.length > 6 ? " et al." : "")
+            : "",
+          year: Number.isInteger(year) && year > 0 ? year : null,
+          venue: plain(p["container-title"]?.[0], 300),
+          doi,
+          openAccess: null,
+        },
+      };
+    });
+  } else if (source === "europepmc") {
+    if (body.errMsg || !Array.isArray(body.resultList?.result))
+      throw new Error("Europe PMC 响应格式不完整或检索式无效。");
+    rows = body.resultList.result.map((p: any) => {
+      const doi = plain(p.doi, 300).toLowerCase();
+      const year = Number(p.pubYear);
+      return {
+        title: p.title,
+        url: doi
+          ? `https://doi.org/${doi}`
+          : `https://europepmc.org/article/${encodeURIComponent(p.source)}/${encodeURIComponent(p.id)}`,
+        snippet: p.abstractText,
+        paper: {
+          authors: plain(p.authorString, 1000),
+          year: Number.isInteger(year) && year > 0 ? year : null,
+          venue: plain(p.journalInfo?.journal?.title, 300),
+          doi,
+          openAccess:
+            p.isOpenAccess === "Y"
+              ? true
+              : p.isOpenAccess === "N"
+                ? false
+                : null,
+        },
+      };
+    });
+  } else {
+    const values = source === "brave" ? body.web?.results : body.results;
+    if (!Array.isArray(values))
+      throw new Error(`${sourceNames[source]} 响应格式不完整。`);
+    rows = values.map((p: any) => ({
+      title: p.title,
+      url: p.url || p.link,
+      snippet: source === "tavily" ? p.content : p.description || p.snippet,
+    }));
+  }
+  return normalizeResults(rows, source, limit);
+}
+export function isMarketplaceProduct(
+  raw: string,
+  market: ShoppingMarket,
+): boolean {
+  const u = new URL(raw),
+    h = u.hostname;
+  if (market === "amazon")
+    return (
+      (h === "amazon.com" || h.endsWith(".amazon.com")) &&
+      /\/(dp|gp\/product)\/[a-z0-9]{10}(?:\/|$)/i.test(u.pathname)
+    );
+  if (market === "taobao")
+    return (
+      ["item.taobao.com", "detail.tmall.com"].includes(h) &&
+      u.pathname === "/item.htm" &&
+      /^\d+$/.test(u.searchParams.get("id") || "")
+    );
+  return h === "item.jd.com" && /^\/\d+\.html$/.test(u.pathname);
+}
+export async function retrieveSearch(
+  input: unknown,
+  keys: SearchKeys,
+  fetcher: typeof fetch = fetch,
+): Promise<SearchSnapshot> {
+  const { query, sources, limit, market } = validateSearch(input),
+    start = performance.now();
+  const results = await Promise.all(
+    sources.map(async (source) => {
+      const t = performance.now();
+      try {
+        const domains =
+          market === "amazon"
+            ? "site:amazon.com"
+            : market === "taobao"
+              ? "(site:item.taobao.com OR site:detail.tmall.com)"
+              : "site:item.jd.com";
+        let items = await lane(
+          source,
+          market ? `${query} ${domains}` : query,
+          limit,
+          keys,
+          fetcher,
+        );
+        if (market)
+          items = items.filter((p) => isMarketplaceProduct(p.url, market));
+        return { source, items, ms: performance.now() - t, error: null };
+      } catch (e) {
+        return {
+          source,
+          items: [] as SearchCandidate[],
+          ms: performance.now() - t,
+          error: (e as Error).message,
+        };
+      }
+    }),
+  );
+  if (results.every((r) => r.error))
+    throw new Error(results.map((r) => r.error).join(" "));
+  // Interleave sources before scoring, so a large source cannot hide another.
+  const map = new Map<string, SearchCandidate>();
+  for (let rank = 0; rank < limit; rank++)
+    for (const result of results) {
+      const item = result.items[rank];
+      if (!item) continue;
+      const old = map.get(item.url);
+      if (old) {
+        if (!old.sources.includes(result.source))
+          old.sources.push(result.source);
+        if (item.snippet.length > old.snippet.length)
+          old.snippet = item.snippet;
+        if (item.paper) {
+          if (!old.paper) old.paper = item.paper;
+          else {
+            if (item.paper.openAccess !== null)
+              old.paper.openAccess = item.paper.openAccess;
+            if (!old.paper.authors) old.paper.authors = item.paper.authors;
+            if (!old.paper.year) old.paper.year = item.paper.year;
+            if (!old.paper.venue) old.paper.venue = item.paper.venue;
+          }
+        }
+      } else
+        map.set(item.url, {
+          ...item,
+          sources: [...item.sources],
+          originalRank: map.size + 1,
+        });
+    }
+  const candidates = [...map.values()];
+  return {
+    id: randomUUID(),
+    query,
+    createdAt: new Date().toISOString(),
+    candidates,
+    lanes: results.map((r) => ({
+      source: r.source,
+      ms: r.ms,
+      count: r.items.length,
+      error: r.error,
+    })),
+    searchMs: performance.now() - start,
+    requestedLimit: limit,
+    ...(market ? { market } : {}),
+    fingerprint: createHash("sha256")
+      .update(JSON.stringify(candidates))
+      .digest("hex"),
+  };
+}
+function terms(s: string) {
+  const chunks = s.toLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
+  return [
+    ...new Set(
+      chunks
+        .flatMap((t) =>
+          /[\u3400-\u9fff]/.test(t)
+            ? [...t].slice(0, -1).map((_, i) => t.slice(i, i + 2))
+            : [t],
+        )
+        .filter((t) => t.length > 1),
+    ),
+  ];
+}
+function overlap(query: string, text: string) {
+  const words = terms(query);
+  return words.length
+    ? words.filter((t) => text.toLowerCase().includes(t)).length / words.length
+    : 0;
+}
+// Reuse the typed scoring boundary; prices and auction fields never enter a search prompt.
+function modelItem(c: SearchCandidate): Product {
+  return {
+    id: c.id,
+    name: c.title,
+    subtitle: c.snippet,
+    category: c.sources.join(","),
+    tags: [],
+    brand: "",
+    price: 0,
+    quality: 0,
+    art: "",
+    color: "#ffffff",
+    bid: 0,
+    mission: "search",
+  };
+}
+export async function rankSearch(
+  snapshot: SearchSnapshot,
+  input: any,
+  deciderFor: (p: Provider) => Decider | undefined,
+): Promise<SearchResult> {
+  const intent = string(input?.intent, "需求描述", 1500);
+  if (
+    !Array.isArray(input.providers) ||
+    !input.providers.length ||
+    input.providers.length > 5 ||
+    new Set(input.providers).size !== input.providers.length ||
+    input.providers.some((p: any) => !MODELS.includes(p))
+  )
+    throw new Error("请选择 1–5 个不同决策模型。");
+  if (
+    typeof input.threshold !== "number" ||
+    !Number.isFinite(input.threshold) ||
+    input.threshold < 0 ||
+    input.threshold > 1
+  )
+    throw new Error("筛选阈值需在 0–1 之间。");
+  function ids(value: unknown): string[] {
+    if (
+      !Array.isArray(value) ||
+      value.length > snapshot.candidates.length ||
+      new Set(value).size !== value.length ||
+      value.some((id) => !snapshot.candidates.some((c) => c.id === id))
+    )
+      throw new Error("反馈包含未知或重复候选。");
+    return value;
+  }
+  const liked = ids(input.liked ?? []),
+    excluded = ids(input.excluded ?? []);
+  if (liked.some((id) => excluded.includes(id)))
+    throw new Error("同一候选不可同时喜欢与排除。");
+  const items = snapshot.candidates.map(modelItem),
+    lexical = new Map(
+      items.map((p) => [p.id, overlap(intent, `${p.name} ${p.subtitle}`)]),
+    ),
+    start = performance.now();
+  const decisions: SearchDecision[] = [];
+  for (const provider of input.providers as Provider[]) {
+    const t = performance.now();
+    try {
+      const config: Config = {
+        query: intent,
+        mission: "search",
+        budget: 1,
+        maxItems: null,
+        diversity: 0,
+        provider,
+        likes: liked,
+        dislikes: excluded,
+        locked: [],
+        ads: false,
+        adWeight: 0,
+      };
+      let scored;
+      if (provider === "baseline")
+        scored = {
+          evidence: items.map((p) => ({
+            id: p.id,
+            relevance: lexical.get(p.id)!,
+            affinity: liked.includes(p.id)
+              ? 1
+              : liked.length
+                ? 0.5 +
+                  0.5 *
+                    Math.max(
+                      ...items
+                        .filter((x) => liked.includes(x.id))
+                        .map((x) =>
+                          overlap(
+                            x.name + " " + x.subtitle,
+                            p.name + " " + p.subtitle,
+                          ),
+                        ),
+                    )
+                : 0.5,
+            confidence: null,
+            lexical: lexical.get(p.id)!,
+            source: "baseline" as const,
+          })),
+          model: "lexical-overlap-v1",
+          calls: 0,
+          usage: null,
+          rawAnswers: null,
+        };
+      else {
+        const decider = deciderFor(provider);
+        if (!decider) throw new Error("尚未配置此模型连接。");
+        scored = items.length
+          ? await decider(config, items, lexical, "search", {
+              liked: items.filter((p) => liked.includes(p.id)),
+              disliked: items.filter((p) => excluded.includes(p.id)),
+            })
+          : {
+              evidence: [],
+              model: `${provider}-not-called`,
+              calls: 0,
+              usage: null,
+              rawAnswers: null,
+            };
+      }
+      if (
+        scored.evidence.length !== items.length ||
+        new Set(scored.evidence.map((e) => e.id)).size !== items.length ||
+        scored.evidence.some(
+          (e) =>
+            !items.some((p) => p.id === e.id) ||
+            ![e.relevance, e.affinity].every(
+              (v) => Number.isFinite(v) && v >= 0 && v <= 1,
+            ),
+        )
+      )
+        throw new Error("评分不完整或越界，未生成替代结果。");
+      const rows = snapshot.candidates
+        .map((c) => {
+          const evidence = scored.evidence.find((e) => e.id === c.id)!,
+            score = 0.7 * evidence.relevance + 0.3 * evidence.affinity;
+          const retained = !excluded.includes(c.id) && score >= input.threshold;
+          return {
+            ...c,
+            evidence,
+            score,
+            retained,
+            rank: 0,
+            reason: excluded.includes(c.id)
+              ? "你已排除"
+              : score < input.threshold
+                ? "低于当前阈值"
+                : "达到当前匹配阈值",
+          };
+        })
+        .sort(
+          (a, b) =>
+            b.score - a.score ||
+            b.sources.length - a.sources.length ||
+            a.originalRank - b.originalRank,
+        )
+        .map((r, i) => ({ ...r, rank: i + 1 }));
+      decisions.push({
+        provider,
+        model: scored.model,
+        rows,
+        ms: performance.now() - t,
+        calls: scored.calls,
+        usage: scored.usage,
+        rawAnswers: scored.rawAnswers,
+        error: null,
+      });
+    } catch (e) {
+      decisions.push({
+        provider,
+        model: "",
+        rows: [],
+        ms: performance.now() - t,
+        calls: null,
+        usage: null,
+        rawAnswers: null,
+        error:
+          provider === "jev"
+            ? "Jev 评分失败，请检查连接、配额或返回格式；未使用替代分数。"
+            : (e as Error).message,
+      });
+    }
+  }
+  return {
+    snapshot,
+    intent,
+    threshold: input.threshold,
+    liked,
+    excluded,
+    decisions,
+    rankingMs: performance.now() - start,
+    createdAt: new Date().toISOString(),
+    scoring:
+      "0.7 × relevance + 0.3 × preference fit; semantic scores, not factual correctness or calibrated click probabilities",
+  };
+}
+export class SearchStore {
+  private snapshots = new Map<string, SearchSnapshot>();
+  add(snapshot: SearchSnapshot) {
+    this.snapshots.set(snapshot.id, structuredClone(snapshot));
+    while (this.snapshots.size > 20)
+      this.snapshots.delete(this.snapshots.keys().next().value!);
+  }
+  get(id: string) {
+    const s = this.snapshots.get(id);
+    if (!s || Date.now() - Date.parse(s.createdAt) > 30 * 60 * 1000)
+      throw new Error("搜索快照已过期，请重新搜索。旧结果仍可导出。");
+    return structuredClone(s);
+  }
+}

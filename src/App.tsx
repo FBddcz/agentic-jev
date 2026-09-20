@@ -1,4 +1,12 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useLocale, setLocale, t } from "./i18n";
+import {
+  useEffect,
+  useRef,
+  useState,
+  lazy,
+  Suspense,
+  type ReactNode,
+} from "react";
 import {
   ArrowUpRight,
   ArrowRight,
@@ -34,7 +42,10 @@ import {
 } from "lucide-react";
 import { defaultConfig, missions, products } from "./data";
 import type { Config, Evaluation, Ranked, Run } from "./types";
-import { Landscape, ProductArt, VisualMode, photoAssets } from "./Art";
+import { SearchLab } from "./SearchLab";
+import { PresetManager } from "./PresetManager";
+import { algorithmSettings } from "./settings";
+import { Landscape, ProductArt, productPhoto } from "./Art";
 import {
   ModelSettings,
   ModelCompare,
@@ -42,10 +53,14 @@ import {
   providerNames,
 } from "./ModelPanels";
 
+const SceneStudio = lazy(() =>
+  import("./SceneStudio").then((m) => ({ default: m.SceneStudio })),
+);
+
 const money = (n: number) =>
   `¥${n.toLocaleString("zh-CN", { maximumFractionDigits: 2 })}`;
 const pct = (n: number) => `${Math.round(n * 100)}%`;
-const icons = {
+const icons: Record<string, typeof Tent> = {
   camp: Tent,
   desk: Monitor,
   commute: BriefcaseBusiness,
@@ -149,7 +164,7 @@ function ProductCard({
           onClick={() => onInspect(p)}
           aria-label={`查看${p.name}的推荐依据`}
         >
-          <ProductArt kind={p.art} color={p.color} />
+          <ProductArt kind={p.art} productId={p.id} name={p.name} />
         </button>
         {config.locked.includes(p.id) && (
           <span className="locked-tag">
@@ -311,8 +326,18 @@ function Sources() {
   );
 }
 export default function App() {
-  const [visual, setVisual] = useState<"photos" | "illustrations">("photos");
-  const [page, setPage] = useState<"discover" | "lab" | "research">("discover");
+  const locale = useLocale();
+  useEffect(() => {
+    document.documentElement.lang = locale === "en" ? "en" : "zh-CN";
+    document.title =
+      locale === "en" ? "Shiyi · AgenticJev" : "拾意 · AgenticJev";
+  }, [locale]);
+  const [page, setPage] = useState<"discover" | "lab" | "research" | "search">(
+    "search",
+  );
+  const [shoppingMode, setShoppingMode] = useState<"studio" | "live" | "demo">(
+    "studio",
+  );
   const [config, setConfig] = useState<Config>({ ...defaultConfig });
   const [run, setRun] = useState<Run | null>(null),
     [busy, setBusy] = useState(false),
@@ -324,6 +349,7 @@ export default function App() {
     profiles: profileDefaults,
   });
   const [settings, setSettings] = useState(false);
+  const [presetOpen, setPresetOpen] = useState(false);
   const [inspect, setInspect] = useState<Ranked | null>(null),
     [showCandidates, setShowCandidates] = useState(false),
     [filter, setFilter] = useState("");
@@ -336,7 +362,11 @@ export default function App() {
     (m) => m.id === (run?.mission ?? config.mission),
   )!;
   const requestedScene = missions.find((m) => m.id === config.mission)!;
-  const stale = run && JSON.stringify(run.config) !== JSON.stringify(config);
+  const stale =
+    run &&
+    (Object.keys(config) as (keyof Config)[]).some(
+      (key) => JSON.stringify(run.config[key]) !== JSON.stringify(config[key]),
+    );
   async function refreshStatus() {
     try {
       const s = await api<typeof status>("status");
@@ -383,15 +413,43 @@ export default function App() {
     };
     setConfig(next);
     setPage("discover");
+    setShoppingMode("demo");
     void generate(next);
   }
+  async function swapOne(id: string) {
+    if (!run || !shown?.some((p) => p.id === id)) return;
+    setBusy(true);
+    setError("");
+    try {
+      const result = await api<Run>("replace", {
+        config,
+        ids: shown.map((p) => p.id),
+        targetId: id,
+      });
+      setRun(result);
+      setConfig(result.config);
+      setCompare(false);
+      setToast("已替换这一件，其余商品保持不变。");
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
   function feedback(id: string, type: "likes" | "locked" | "dislikes") {
+    if (type === "dislikes") {
+      void swapOne(id);
+      return;
+    }
     if (
       type === "locked" &&
       !config.locked.includes(id) &&
-      config.locked.length >= 4
+      config.maxItems !== null &&
+      config.locked.length >= config.maxItems
     ) {
-      setToast("最多固定 4 件，请先取消固定一件。");
+      setToast(
+        `当前最多固定 ${config.maxItems} 件，请提高组合上限或取消固定。`,
+      );
       return;
     }
     const next = {
@@ -400,13 +458,14 @@ export default function App() {
         ? config[type].filter((v) => v !== id)
         : [...config[type], id],
     };
-    if (type === "dislikes") {
-      next.locked = next.locked.filter((v) => v !== id);
-      next.likes = next.likes.filter((v) => v !== id);
-    }
     setConfig(next);
-    void generate(next);
+    setToast(
+      type === "likes"
+        ? "偏好已保存，下次生成时使用。"
+        : "固定状态已更新，其余商品保持不变。",
+    );
   }
+
   async function runEvaluation() {
     setBusy(true);
     setError("");
@@ -423,8 +482,8 @@ export default function App() {
   }
   const shown = compare ? run?.greedy : run?.slate;
   return (
-    <VisualMode.Provider value={visual}>
-      <div className="app-shell">
+    <>
+      <div className={`app-shell ${page === "search" ? "is-search-home" : ""}`}>
         <aside className="sidebar">
           <a
             className="brand"
@@ -437,7 +496,7 @@ export default function App() {
             <span className="brand-icon">✳</span>
             <div>
               <strong>
-                拾意<span>RecJev</span>
+                拾意<span>AgenticJev</span>
               </strong>
               <small>LESS SCROLL. MORE YOU.</small>
             </div>
@@ -447,6 +506,7 @@ export default function App() {
             {(
               [
                 { id: "discover", name: "灵感探索", icon: Compass },
+                { id: "search", name: "联网决策", icon: Search },
                 { id: "lab", name: "对照实验", icon: FlaskConical },
                 { id: "research", name: "研究地图", icon: BookOpen },
               ] as const
@@ -466,7 +526,7 @@ export default function App() {
           <span className="nav-caption">从一个小计划开始</span>
           <div className="mission-nav">
             {missions.map((m) => {
-              const Icon = icons[m.id];
+              const Icon = icons[m.id] ?? Sparkles;
               return (
                 <button
                   disabled={busy}
@@ -501,7 +561,7 @@ export default function App() {
             </span>
           </div>
           <a
-            href="https://github.com/FBddcz/rec-jev"
+            href="https://github.com/FBddcz/agentic-jev"
             target="_blank"
             rel="noreferrer"
             className="github-link"
@@ -511,6 +571,53 @@ export default function App() {
           </a>
         </aside>
         <div className="workspace">
+          <header className="artist-nav">
+            <button className="artist-logo" onClick={() => setPage("search")}>
+              <span>✳</span>拾意<small>AgenticJev</small>
+            </button>
+            <nav aria-label="Main navigation">
+              <button
+                className={page === "search" ? "active" : ""}
+                onClick={() => setPage("search")}
+              >
+                联网决策
+              </button>
+              <button
+                className={page === "discover" ? "active" : ""}
+                onClick={() => setPage("discover")}
+              >
+                购物发现
+              </button>
+              <button
+                className={page === "lab" ? "active" : ""}
+                onClick={() => setPage("lab")}
+              >
+                对照实验
+              </button>
+              <button
+                className={page === "research" ? "active" : ""}
+                onClick={() => setPage("research")}
+              >
+                研究地图
+              </button>
+            </nav>
+            <button
+              className="language-switch"
+              aria-label={
+                locale === "en" ? "Switch to Chinese" : "Switch to English"
+              }
+              onClick={() => setLocale(locale === "en" ? "zh" : "en")}
+            >
+              <span className={locale === "en" ? "selected" : ""}>EN</span>
+              <i>/</i>
+              <span
+                className={locale === "zh" ? "selected" : ""}
+                translate="no"
+              >
+                中文
+              </span>
+            </button>
+          </header>
           <header className="topbar">
             <div className="breadcrumb">
               发现生活的另一种可能<span>/</span>
@@ -519,19 +626,19 @@ export default function App() {
                   ? "灵感探索"
                   : page === "lab"
                     ? "对照实验"
-                    : "研究地图"}
+                    : page === "search"
+                      ? "联网决策"
+                      : "研究地图"}
               </strong>
             </div>
             <div className="top-actions">
               <button
-                className="visual-toggle"
-                onClick={() =>
-                  setVisual(visual === "photos" ? "illustrations" : "photos")
-                }
-                aria-label="切换照片与插画"
+                className="connection preset-trigger"
+                onClick={() => setPresetOpen(true)}
+                disabled={busy}
               >
-                {visual === "photos" ? "实拍参考" : "插画模式"}
-                <RefreshCw size={12} />
+                <BookOpen size={14} />
+                实验预设
               </button>
               <button
                 className="connection"
@@ -561,6 +668,43 @@ export default function App() {
               </div>
             )}
             {page === "discover" && (
+              <div className="shopping-mode" role="group" aria-label="购物模式">
+                <button
+                  aria-pressed={shoppingMode === "studio"}
+                  onClick={() => setShoppingMode("studio")}
+                >
+                  场景试搭
+                </button>
+                <button
+                  aria-pressed={shoppingMode === "live"}
+                  onClick={() => setShoppingMode("live")}
+                >
+                  真实平台
+                </button>
+                <button
+                  aria-pressed={shoppingMode === "demo"}
+                  onClick={() => setShoppingMode("demo")}
+                >
+                  演示搭配
+                </button>
+              </div>
+            )}
+            {page === "discover" && shoppingMode === "studio" && (
+              <Suspense fallback={<p>正在加载场景…</p>}>
+                <SceneStudio
+                  profiles={status.profiles}
+                  onModelSettings={() => setSettings(true)}
+                />
+              </Suspense>
+            )}
+            {page === "discover" && shoppingMode === "live" && (
+              <SearchLab
+                shopping
+                profiles={status.profiles}
+                onModelSettings={() => setSettings(true)}
+              />
+            )}
+            {page === "discover" && shoppingMode === "demo" && (
               <>
                 <div className="page-heading">
                   <div>
@@ -605,18 +749,12 @@ export default function App() {
                       <div className="hero-object">
                         <ProductArt
                           kind={
-                            config.mission === "desk"
-                              ? "lamp"
-                              : config.mission === "coffee"
-                                ? "kettle"
-                                : "bag"
+                            products.find((p) => p.mission === config.mission)
+                              ?.art ?? ""
                           }
-                          color={
-                            config.mission === "desk"
-                              ? "#9b9d82"
-                              : config.mission === "coffee"
-                                ? "#ac8969"
-                                : "#839a8c"
+                          productId={
+                            products.find((p) => p.mission === config.mission)
+                              ?.id
                           }
                         />
                       </div>
@@ -627,7 +765,7 @@ export default function App() {
                       <span className="hero-number">
                         0
                         {missions.findIndex((m) => m.id === config.mission) + 1}{" "}
-                        / 04
+                        / {String(missions.length).padStart(2, "0")}
                       </span>
                     </div>
                   </section>
@@ -640,14 +778,31 @@ export default function App() {
                       <span>实时可调</span>
                     </div>
                     <label className="range-label" htmlFor="budget">
-                      整套预算<strong>{money(config.budget)}</strong>
+                      整套预算
+                      <span className="budget-entry">
+                        ¥
+                        <input
+                          aria-label="自定义预算"
+                          type="number"
+                          min="1"
+                          step="1"
+                          inputMode="numeric"
+                          value={config.budget}
+                          disabled={busy}
+                          onChange={(e) => {
+                            const n = e.target.valueAsNumber;
+                            if (Number.isSafeInteger(n) && n > 0)
+                              setConfig({ ...config, budget: n });
+                          }}
+                        />
+                      </span>
                     </label>
                     <input
                       id="budget"
                       type="range"
-                      min="100"
-                      max="3000"
-                      step="50"
+                      min="1"
+                      max={Math.max(3000, config.budget)}
+                      step="1"
                       value={config.budget}
                       disabled={busy}
                       onChange={(e) =>
@@ -655,8 +810,8 @@ export default function App() {
                       }
                     />
                     <div className="range-ends">
-                      <span>¥100</span>
-                      <span>¥3,000</span>
+                      <span>¥1</span>
+                      <span>{money(Math.max(3000, config.budget))}</span>
                     </div>
                     <label
                       className="range-label diversity-label"
@@ -684,6 +839,39 @@ export default function App() {
                       <span>互补优先</span>
                     </div>
                     <div className="preference-rule" />
+                    <div className="engine-label slate-size-label">
+                      <label htmlFor="slate-count">搭配数量</label>
+                      <div className="quantity-control">
+                        <button
+                          type="button"
+                          className={config.maxItems === null ? "selected" : ""}
+                          disabled={busy}
+                          onClick={() =>
+                            setConfig({ ...config, maxItems: null })
+                          }
+                        >
+                          随心配
+                        </button>
+                        <input
+                          id="slate-count"
+                          aria-label="最多件数（留空自动）"
+                          type="number"
+                          inputMode="numeric"
+                          min="1"
+                          step="1"
+                          placeholder="自定上限"
+                          disabled={busy}
+                          value={config.maxItems ?? ""}
+                          onChange={(e) => {
+                            const n = e.target.valueAsNumber;
+                            if (!e.target.value)
+                              setConfig({ ...config, maxItems: null });
+                            else if (Number.isSafeInteger(n) && n > 0)
+                              setConfig({ ...config, maxItems: n });
+                          }}
+                        />
+                      </div>
+                    </div>
                     <label className="engine-label">
                       决策引擎
                       <select
@@ -734,7 +922,11 @@ export default function App() {
                     <label htmlFor="intent">这一刻，你想要什么？</label>
                     <input
                       id="intent"
-                      value={config.query}
+                      value={
+                        missions.some((m) => m.query === config.query)
+                          ? t(config.query)
+                          : config.query
+                      }
                       maxLength={500}
                       disabled={busy}
                       onChange={(e) =>
@@ -814,7 +1006,7 @@ export default function App() {
                       className="icon-btn"
                       disabled={!run}
                       onClick={() =>
-                        download(run, `recjev-${run!.id.slice(0, 8)}.json`)
+                        download(run, `agenticjev-${run!.id.slice(0, 8)}.json`)
                       }
                       aria-label="导出本次实验 JSON"
                     >
@@ -855,9 +1047,10 @@ export default function App() {
                     />
                   ))}
                   {!run &&
-                    Array.from({ length: 4 }, (_, i) => (
-                      <div key={i} className="product-skeleton" />
-                    ))}
+                    Array.from(
+                      { length: Math.min(config.maxItems ?? 4, 8) },
+                      (_, i) => <div key={i} className="product-skeleton" />,
+                    )}
                   {run && shown?.length === 0 && (
                     <div className="empty-state">
                       <Search />
@@ -866,85 +1059,89 @@ export default function App() {
                     </div>
                   )}
                 </div>
-                <div className="under-grid">
-                  <section className="decision-card">
-                    <div className="panel-heading">
-                      <h3>
-                        <Zap size={17} />
-                        每一步，都看得见
-                      </h3>
-                      <span className="pill">
-                        {run?.modelCalls ?? 0} 次模型调用
-                      </span>
-                    </div>
-                    <div className="trace-steps">
-                      {(run?.trace ?? []).map((t, i) => (
-                        <div key={t.name}>
-                          <span className="step-number">0{i + 1}</span>
-                          <strong>{t.name}</strong>
-                          <p>{t.detail}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="trace-footer">
-                      <span>
-                        <span className="online-dot" />
-                        {run?.model ?? "准备中"}
-                      </span>
-                      <span>
-                        本次服务端耗时{" "}
-                        <b>{run ? run.totalLatency.toFixed(1) : "—"} ms</b>
-                      </span>
-                      <button
-                        className="text-btn"
-                        onClick={() => setPage("lab")}
-                      >
-                        去做对照实验
-                        <ArrowUpRight size={13} />
-                      </button>
-                    </div>
-                  </section>
-                  <section className="sponsor-card">
-                    <div className="sponsor-top">
-                      <span className="eyebrow">ANOTHER GOOD FIND</span>
-                      <span className="ad-label">赞助 · 模拟</span>
-                    </div>
-                    {run?.auction.winner ? (
-                      <>
-                        <div className="sponsor-content">
-                          <ProductArt
-                            kind={run.auction.winner.art}
-                            color={run.auction.winner.color}
-                          />
-                          <div>
-                            <h3>{run.auction.winner.name}</h3>
-                            <p>给你的计划，多一种选择。</p>
-                            <strong>{money(run.auction.winner.price)}</strong>
-                            <button
-                              className="text-btn"
-                              onClick={() => setInspect(run.auction.winner)}
-                            >
-                              为什么是它
-                              <ArrowUpRight size={13} />
-                            </button>
-                          </div>
-                        </div>
-                        <span className="sponsor-note">
-                          独立于组合预算 · 模拟 CPC {money(run.auction.cpc)}
+                <details className="bundle-details">
+                  <summary>查看决策与实验信息</summary>
+                  <div className="under-grid">
+                    <section className="decision-card">
+                      <div className="panel-heading">
+                        <h3>
+                          <Zap size={17} />
+                          每一步，都看得见
+                        </h3>
+                        <span className="pill">
+                          {run?.modelCalls ?? 0} 次模型调用
                         </span>
-                      </>
-                    ) : (
-                      <div className="sponsor-empty">
-                        <Leaf size={25} />
-                        <p>
-                          {run?.config.ads
-                            ? "没有满足相关性门槛的赞助好物"
-                            : "只留发现，不加赞助。"}
-                        </p>
                       </div>
-                    )}
-                  </section>
-                </div>
+                      <div className="trace-steps">
+                        {(run?.trace ?? []).map((t, i) => (
+                          <div key={t.name}>
+                            <span className="step-number">0{i + 1}</span>
+                            <strong>{t.name}</strong>
+                            <p>{t.detail}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="trace-footer">
+                        <span>
+                          <span className="online-dot" />
+                          {run?.model ?? "准备中"}
+                        </span>
+                        <span>
+                          本次服务端耗时{" "}
+                          <b>{run ? run.totalLatency.toFixed(1) : "—"} ms</b>
+                        </span>
+                        <button
+                          className="text-btn"
+                          onClick={() => setPage("lab")}
+                        >
+                          去做对照实验
+                          <ArrowUpRight size={13} />
+                        </button>
+                      </div>
+                    </section>
+                    <section className="sponsor-card">
+                      <div className="sponsor-top">
+                        <span className="eyebrow">ANOTHER GOOD FIND</span>
+                        <span className="ad-label">赞助 · 模拟</span>
+                      </div>
+                      {run?.auction.winner ? (
+                        <>
+                          <div className="sponsor-content">
+                            <ProductArt
+                              kind={run.auction.winner.art}
+                              productId={run.auction.winner.id}
+                              name={run.auction.winner.name}
+                            />
+                            <div>
+                              <h3>{run.auction.winner.name}</h3>
+                              <p>给你的计划，多一种选择。</p>
+                              <strong>{money(run.auction.winner.price)}</strong>
+                              <button
+                                className="text-btn"
+                                onClick={() => setInspect(run.auction.winner)}
+                              >
+                                为什么是它
+                                <ArrowUpRight size={13} />
+                              </button>
+                            </div>
+                          </div>
+                          <span className="sponsor-note">
+                            独立于组合预算 · 模拟 CPC {money(run.auction.cpc)}
+                          </span>
+                        </>
+                      ) : (
+                        <div className="sponsor-empty">
+                          <Leaf size={25} />
+                          <p>
+                            {run?.config.ads
+                              ? "没有满足相关性门槛的赞助好物"
+                              : "只留发现，不加赞助。"}
+                          </p>
+                        </div>
+                      )}
+                    </section>
+                  </div>
+                </details>
                 <section className="candidate-section">
                   <button
                     className="candidate-toggle"
@@ -981,7 +1178,11 @@ export default function App() {
                               <span className="candidate-rank">
                                 {String(i + 1).padStart(2, "0")}
                               </span>
-                              <ProductArt kind={p.art} color={p.color} />
+                              <ProductArt
+                                kind={p.art}
+                                productId={p.id}
+                                name={p.name}
+                              />
                               <span>
                                 <strong>{p.name}</strong>
                                 <small>
@@ -1008,7 +1209,8 @@ export default function App() {
                   <CircleHelp size={13} />
                   <span>
                     {run?.warnings.join(" ")}{" "}
-                    商品、价格与广告为合成演示，不支持下单；照片为类别参考，未覆盖类别显示插画。
+                    商品、价格与广告为合成演示，不支持下单；48
+                    件商品分别配有不同的摄影参考。
                   </span>
                 </div>
               </>
@@ -1038,7 +1240,9 @@ export default function App() {
                   </div>
                   <div>
                     <h3>逐件排序 vs. 组合生成</h3>
-                    <p>4 个场景 × 3 档预算 · 12 个固定合成案例 · 一键复现</p>
+                    <p>
+                      4 个场景 × 3 档预算 · 12 个固定合成案例 · 每例上限 4 件
+                    </p>
                   </div>
                   <div className="experiment-options">
                     <label>
@@ -1104,7 +1308,7 @@ export default function App() {
                         onClick={() =>
                           download(
                             evalResult,
-                            `recjev-eval-${evalResult.seed}.json`,
+                            `agenticjev-eval-${evalResult.seed}.json`,
                           )
                         }
                       >
@@ -1270,9 +1474,15 @@ export default function App() {
                 )}
               </>
             )}
+            <div hidden={page !== "search"}>
+              <SearchLab
+                profiles={status.profiles}
+                onModelSettings={() => setSettings(true)}
+              />
+            </div>
             {page === "research" && <Sources />}
             <footer>
-              <span className="footer-brand">✳ 拾意 / RecJev</span>
+              <span className="footer-brand">✳ 拾意 / AgenticJev</span>
               <span>快速决策，让每次发现都有回应。</span>
               <span>Built to play. Designed to question.</span>
             </footer>
@@ -1299,7 +1509,11 @@ export default function App() {
               className="inspect-product"
               style={{ background: `${inspect.color}22` }}
             >
-              <ProductArt kind={inspect.art} color={inspect.color} />
+              <ProductArt
+                kind={inspect.art}
+                productId={inspect.id}
+                name={inspect.name}
+              />
               <div>
                 <span className="eyebrow">{inspect.category}</span>
                 <h2>{inspect.name}</h2>
@@ -1341,16 +1555,16 @@ export default function App() {
                 </strong>
               </div>
             </div>
-            {photoAssets[inspect.art] && visual === "photos" && (
+            {productPhoto(inspect.art, inspect.id) && (
               <p className="photo-credit">
                 照片为类别参考，不代表实售商品。
                 <a
-                  href={photoAssets[inspect.art].page}
+                  href={productPhoto(inspect.art, inspect.id)!.page}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  {photoAssets[inspect.art].author} ·{" "}
-                  {photoAssets[inspect.art].license}
+                  {productPhoto(inspect.art, inspect.id)!.author} ·{" "}
+                  {productPhoto(inspect.art, inspect.id)!.license}
                 </a>
               </p>
             )}
@@ -1361,8 +1575,11 @@ export default function App() {
             <div className="rubric">
               <h4>分数是怎样使用的？</h4>
               <p>
-                单品排序 = 0.68 × 相关性 + 0.22 × 偏好契合 + 0.10 ×
-                商品质量。组合阶段再加入需求覆盖奖励、重复类别惩罚，并严格检查总预算。
+                单品排序结合相关性、偏好契合和商品质量。当前权重分别为{" "}
+                {algorithmSettings.ranking.relevanceWeight} /{" "}
+                {algorithmSettings.ranking.affinityWeight} /{" "}
+                {algorithmSettings.ranking.qualityWeight}
+                ，组合再考虑需求覆盖、重复类别和整套预算。
               </p>
               <p>
                 {inspect.evidence.source === "jev"
@@ -1411,6 +1628,19 @@ export default function App() {
             </div>
           </Modal>
         )}
+        {presetOpen && (
+          <Modal title="实验预设" onClose={() => setPresetOpen(false)}>
+            <PresetManager
+              config={config}
+              onApply={(next) => {
+                setConfig(next);
+                setPage("discover");
+                setPresetOpen(false);
+                setToast("已应用预设，点击生成执行。");
+              }}
+            />
+          </Modal>
+        )}
         {toast && (
           <div className="toast" role="status">
             <Check size={16} />
@@ -1418,6 +1648,6 @@ export default function App() {
           </div>
         )}
       </div>
-    </VisualMode.Provider>
+    </>
   );
 }

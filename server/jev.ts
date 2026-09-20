@@ -1,13 +1,15 @@
 import { TypeSafeClient, type Questions } from "@typesafe-ai/sdk";
 import type { Config, Evidence, Product, Run } from "../src/types";
 import type { Decider } from "./engine";
-import { products } from "../src/data";
 
 function finite(v: unknown, max = 1): v is number {
   return typeof v === "number" && Number.isFinite(v) && v >= 0 && v <= max;
 }
-export function buildQuestions(items: Product[]): Questions {
-  return Object.fromEntries(
+export function buildQuestions(
+  items: Product[],
+  domain: "shopping" | "search" = "shopping",
+): Questions {
+  const questions = Object.fromEntries(
     items.flatMap((p, i) => [
       [
         `rel_${p.id}`,
@@ -34,6 +36,24 @@ export function buildQuestions(items: Product[]): Questions {
       ],
     ]),
   ) as Questions;
+  if (domain === "search") {
+    for (const q of Object.values(questions) as any[]) {
+      q.instructions =
+        q.instructions
+          .replaceAll("shopper", "user")
+          .replaceAll("shopping", "search")
+          .replaceAll("style", "needs")
+          .replaceAll("products", "results")
+          .replaceAll("product text", "result text") +
+        " Judge only the supplied title and snippet; missing facts are unknown, not established.";
+      if (q.type === "noul")
+        q.criteria = {
+          true: "Directly useful for the stated search purpose.",
+          false: "Unrelated to the search purpose.",
+        };
+    }
+  }
+  return questions;
 }
 export function parseAnswers(
   raw: unknown,
@@ -98,6 +118,7 @@ export function parseAnswers(
 export function createJevDecider(
   apiKey: string,
   model = "jev-latest",
+  domain: "shopping" | "search" = "shopping",
 ): Decider {
   // Endpoint is pinned; no user-controlled URL can receive credentials.
   const client = new TypeSafeClient({
@@ -108,7 +129,7 @@ export function createJevDecider(
     retry: { maxRetries: 0 },
     logLevel: "off",
   });
-  return async (c: Config, items, lexical) => {
+  return async (c: Config, items, lexical, _mission, feedback) => {
     const start = performance.now();
     const compact = (p: Product) => ({
       id: p.id,
@@ -122,13 +143,11 @@ export function createJevDecider(
         query: c.query,
         candidates: items.map(compact),
         feedback: {
-          liked: products.filter((p) => c.likes.includes(p.id)).map(compact),
-          disliked: products
-            .filter((p) => c.dislikes.includes(p.id))
-            .map(compact),
+          liked: feedback.liked.map(compact),
+          disliked: feedback.disliked.map(compact),
         },
       },
-      questions: buildQuestions(items),
+      questions: buildQuestions(items, domain),
     });
     return {
       ...parseAnswers(raw, items, lexical),

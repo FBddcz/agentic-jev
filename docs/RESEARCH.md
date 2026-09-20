@@ -1,4 +1,4 @@
-# RecJev 方向调研：快速结构化决策 × 生成式组合推荐
+# AgenticJev 方向调研：快速结构化决策 × 生成式组合推荐
 
 核验日期：2026-09-20。检索范围包括 Google、TypeSafe 官方文档和官方 GitHub 组织、GitHub 搜索与社区索引，以及直接相关的推荐研究仓库。网页资料会变化；这是有范围的调研，不代表穷尽整个互联网。
 
@@ -14,20 +14,20 @@ Jev 擅长在限定答案空间中回答具体语义问题。把用户需求与�
 
 ## 2. 官方已确认事实
 
-| 官方来源                                                                | 核验结论                                                    | 实现含义                             |
-| ----------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------ |
-| [介绍](https://docs.typesafe.ai/introduction)                           | Jev 是 TypeSafe 的 System One 模型                          | 使用官方服务语义而非普通 chat API    |
-| [HTTP API](https://docs.typesafe.ai/api)                                | POST `/v1/systemone`；输入 state / questions / model        | SDK 仅在 Node 后端调用               |
-| [Noul](https://docs.typesafe.ai/primitives/noul)                        | 返回回答 yes 的概率                                         | 每件候选的语义相关性                 |
-| [Score](https://docs.typesafe.ai/primitives/score)                      | 有序标准上的概率加权值；0 起始级别                          | 三档偏好评分除以 2 归一化            |
-| [Choice](https://docs.typesafe.ai/primitives/choice)                    | 有限选项概率分布，最多 255 个选项                           | 后续可做下一步动作选择；首版未调用   |
-| [模型](https://docs.typesafe.ai/models)                                 | 当日 `jev-latest` 指向 `jev-1.13.0`；文本输入；英语表现较好 | 记录返回版本；中文电商效果需另测     |
-| [模型限制](https://docs.typesafe.ai/model-jaggedness/jev-1.13)          | 数学精度、间接引用、无关长上下文、生成文本有局限            | 短名单、直接索引、代码掌管预算       |
-| [官方重排 cookbook](https://docs.typesafe.ai/cookbooks/rerank_typesafe) | BM25 30 条短名单，Jev 判断 query-candidate 相关性           | 借鉴两阶段检索，不照搬其法律检索成绩 |
-| [并行问题](https://docs.typesafe.ai/patterns/fan-out)                   | 一次输入多问题，由程序使用相应结果                          | 24 件候选 × 2 个问题，一次请求       |
-| [置信度](https://docs.typesafe.ai/confidence)                           | Confidence 与问题答案概率不同                               | 仅把 Score confidence 归属到偏好评分 |
-| [JS SDK](https://github.com/typesafe-ai/typesafe-sdk-js)                | 官方 TypeScript/JavaScript SDK，MIT                         | 首版安装使用 0.6.0                   |
-| [Python SDK](https://github.com/typesafe-ai/typesafe-sdk-python)        | 官方 Python SDK，MIT                                        | 后续训练 / 评测可用                  |
+| 官方来源                                                                | 核验结论                                                    | 实现含义                                  |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------- | ----------------------------------------- |
+| [介绍](https://docs.typesafe.ai/introduction)                           | Jev 是 TypeSafe 的 System One 模型                          | 使用官方服务语义而非普通 chat API         |
+| [HTTP API](https://docs.typesafe.ai/api)                                | POST `/v1/systemone`；输入 state / questions / model        | SDK 仅在 Node 后端调用                    |
+| [Noul](https://docs.typesafe.ai/primitives/noul)                        | 返回回答 yes 的概率                                         | 每件候选的语义相关性                      |
+| [Score](https://docs.typesafe.ai/primitives/score)                      | 有序标准上的概率加权值；0 起始级别                          | 三档偏好评分除以 2 归一化                 |
+| [Choice](https://docs.typesafe.ai/primitives/choice)                    | 有限选项概率分布，最多 255 个选项                           | 后续可做下一步动作选择；首版未调用        |
+| [模型](https://docs.typesafe.ai/models)                                 | 当日 `jev-latest` 指向 `jev-1.13.0`；文本输入；英语表现较好 | 记录返回版本；中文电商效果需另测          |
+| [模型限制](https://docs.typesafe.ai/model-jaggedness/jev-1.13)          | 数学精度、间接引用、无关长上下文、生成文本有局限            | 短名单、直接索引、代码掌管预算            |
+| [官方重排 cookbook](https://docs.typesafe.ai/cookbooks/rerank_typesafe) | BM25 30 条短名单，Jev 判断 query-candidate 相关性           | 借鉴两阶段检索，不照搬其法律检索成绩      |
+| [并行问题](https://docs.typesafe.ai/patterns/fan-out)                   | 一次输入多问题，由程序使用相应结果                          | 默认 24 件 × 2 问题一批；更多候选分批请求 |
+| [置信度](https://docs.typesafe.ai/confidence)                           | Confidence 与问题答案概率不同                               | 仅把 Score confidence 归属到偏好评分      |
+| [JS SDK](https://github.com/typesafe-ai/typesafe-sdk-js)                | 官方 TypeScript/JavaScript SDK，MIT                         | 首版安装使用 0.6.0                        |
+| [Python SDK](https://github.com/typesafe-ai/typesafe-sdk-python)        | 官方 Python SDK，MIT                                        | 后续训练 / 评测可用                       |
 
 当日模型页标价为每百万输入 token $0.042，输出免费；速率和价格可能调整。本原型只记录服务返回 usage，不把此静态价格写成真实账单，不展示凭空估算的“节省费用”。官方宣传的速度倍率不作为本项目实测结论。
 
@@ -79,3 +79,14 @@ Jev 擅长在限定答案空间中回答具体语义问题。把用户需求与�
 5. 再研究可学习的组合策略、生成式 item ID 模型或社区本地 RLCD；别用早期合成样本预设优势。
 
 本地推理细节、SemIf 的可借鉴部分及完整实测边界见 [模型指南](MODELS.md)。先验证评分质量与交互收益，再按规模引入检索索引和吞吐基础设施。
+
+## 联网决策与论文检索
+
+0.3.0 增加 GitHub、Hacker News、Crossref、Europe PMC、Search1API 与 Brave 来源，以及候选快照、来源去重、模型对照、反馈重排和实测耗时大盘。这里不预设检索质量提升，关键词基线、语义相关性和事实正确性需分别评估。
+
+- [superagents-lab/jev-search](https://github.com/superagents-lab/jev-search) 展示 Search1API 检索与 Jev 重排。它是社区项目，不是 TypeSafe 官方搜索产品。
+- [browser-use/jev-ultrafast](https://github.com/browser-use/jev-ultrafast) 含航班检索示例，从观察到的 DOM 选择操作与目标。作者报告的单次约 7.1 秒不能当成通用延迟；本项目没有实现浏览器操作或订票。
+- [savka777/jev-search](https://github.com/savka777/jev-search) 的片段相关性过滤与证据计时值得参考；仓库所报性能未在此复现。
+- [zhuyansen/jev-search-rerank-eval](https://github.com/zhuyansen/jev-search-rerank-eval) 提醒注意模型裁判循环与混合排序。应使用独立人工标签检验收益。
+
+论文来源返回的是题录与可用摘要；DOI 去重不合并拥有不同 DOI 的版本，开放获取标记依赖来源。检索能力与文献质量评估、全文阅读是不同问题。完整边界见 [SEARCH.md](SEARCH.md)。

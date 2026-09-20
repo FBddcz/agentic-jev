@@ -1,4 +1,8 @@
+import type { EngineProvenance } from "./settings";
+
 export type Provider = "baseline" | "jev" | "openai" | "claude" | "minicpm";
+export const slateSizes = [4, 6, 8, 12] as const;
+export type SlateSize = number | null;
 export type Profile = {
   provider: Exclude<Provider, "baseline">;
   model: string;
@@ -6,7 +10,7 @@ export type Profile = {
   configured: boolean;
   verified: boolean;
 };
-export type MissionId = "camp" | "desk" | "commute" | "coffee";
+export type MissionId = string;
 export type Product = {
   id: string;
   name: string;
@@ -37,6 +41,7 @@ export type Config = {
   query: string;
   mission: MissionId;
   budget: number;
+  maxItems: SlateSize;
   diversity: number;
   provider: Provider;
   likes: string[];
@@ -72,6 +77,12 @@ export type Auction = {
   note: string;
 };
 export type Run = {
+  replacement?: {
+    targetId: string;
+    replacementId: string;
+    preservedIds: string[];
+  };
+  engine: EngineProvenance;
   id: string;
   createdAt: string;
   config: Config;
@@ -94,6 +105,7 @@ export type Run = {
   version: string;
 };
 export type Evaluation = {
+  engine: EngineProvenance;
   seed: number;
   cases: number;
   provider: Provider;

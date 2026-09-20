@@ -1,6 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { products, defaultConfig, missions } from "../src/data";
+import {
+  products,
+  defaultConfig as appDefaultConfig,
+  missions,
+} from "../src/data";
+import { slateSizes } from "../src/types";
 import {
   generate,
   validateConfig,
@@ -12,6 +17,8 @@ import {
 } from "../server/engine";
 import { parseAnswers, buildQuestions } from "../server/jev";
 import { evaluate, ndcg } from "../server/evaluation";
+
+const defaultConfig = { ...appDefaultConfig, maxItems: 4 };
 
 test("all four scenes respect hard budgets, uniqueness and exclusions across budget levels", async () => {
   for (const m of missions)
@@ -50,6 +57,91 @@ test("fixed items are retained, and overspending fixed sets are rejected", async
     () =>
       validateConfig({ ...defaultConfig, locked: ["c01"], dislikes: ["c01"] }),
     /冲突/,
+  );
+});
+test("all slate sizes obey budgets and exclusions, and can exceed four items", async () => {
+  for (const maxItems of slateSizes) {
+    const full = await generate({
+      ...defaultConfig,
+      maxItems,
+      budget: 10000,
+      diversity: 0,
+    });
+    assert.equal(full.config.maxItems, maxItems);
+    assert.equal(full.slate.length, maxItems);
+    assert.equal(full.greedy.length, maxItems);
+    assert.ok(full.trace.some((s) => s.detail.includes(`最多 ${maxItems} 件`)));
+    for (const budget of [100, 600, 1500]) {
+      const run = await generate({
+        ...defaultConfig,
+        maxItems,
+        budget,
+        dislikes: ["c01"],
+      });
+      for (const list of [run.slate, run.greedy]) {
+        assert.ok(list.length <= maxItems);
+        assert.ok(list.reduce((sum, p) => sum + p.price, 0) <= budget);
+        assert.equal(new Set(list.map((p) => p.id)).size, list.length);
+        assert.ok(list.every((p) => p.id !== "c01"));
+      }
+    }
+  }
+});
+test("legacy configs default to four; invalid or coerced limits are rejected", async () => {
+  const { maxItems: _, ...legacy } = defaultConfig;
+  assert.equal(validateConfig(legacy).maxItems, 4);
+  assert.equal((await generate(legacy)).config.maxItems, 4);
+  for (const maxItems of [
+    "6",
+    0,
+    -1,
+    6.5,
+    NaN,
+    Infinity,
+    Number.MAX_SAFE_INTEGER + 1,
+  ])
+    assert.throws(
+      () => validateConfig({ ...defaultConfig, maxItems }),
+      /组合件数/,
+    );
+});
+test("six fixed products fit a six-item limit, and reducing below fixed count fails", async () => {
+  const locked = products.slice(0, 6).map((p) => p.id);
+  const run = await generate({
+    ...defaultConfig,
+    maxItems: 6,
+    locked,
+    budget: 10000,
+  });
+  for (const list of [run.slate, run.greedy])
+    assert.deepEqual(new Set(list.map((p) => p.id)), new Set(locked));
+  assert.throws(() => validateConfig({ ...run.config, maxItems: 4 }), /冲突/);
+});
+test("larger slates keep the same candidate scoring batch and one model request", async () => {
+  const batches: string[][] = [];
+  for (const maxItems of slateSizes) {
+    let calls = 0;
+    const run = await generate(
+      { ...defaultConfig, maxItems, provider: "jev", budget: 10000 },
+      async (c, items, lexical, mission) => {
+        calls++;
+        batches.push(items.map((p) => p.id));
+        assert.ok(Object.keys(buildQuestions(items)).length <= 48);
+        return {
+          evidence: baselineEvidence(c, items, lexical, mission),
+          model: "contract-test-fixture",
+          calls: 1,
+          latency: 1,
+          rawAnswers: null,
+          usage: null,
+        };
+      },
+    );
+    assert.equal(calls, 1);
+    assert.equal(run.modelCalls, 1);
+  }
+  assert.ok(
+    batches.every((ids) => JSON.stringify(ids) === JSON.stringify(batches[0])),
   );
 });
 test("unknown products, numeric strings, NaN and extra providers cannot enter engine", () => {
@@ -201,4 +293,73 @@ test("NDCG has a fixed cutoff and reproducible evaluation reports per-case evide
     b.metrics.map((m) => m.ci),
   );
   assert.ok(a.metrics.every((m) => m.budgetPass === 1 && m.ndcg <= 1));
+  assert.ok(a.rows.every((r) => r.ids.length <= 4));
+  await evaluate("jev", 42, async (c, items, lexical, mission) => {
+    assert.equal(c.maxItems, 4);
+    return {
+      evidence: baselineEvidence(c, items, lexical, mission),
+      model: "fixed-cutoff-fixture",
+      calls: 1,
+      latency: 1,
+      rawAnswers: null,
+      usage: null,
+    };
+  });
+});
+
+test("swapping one item preserves every other item and slot without adding persistent pins", async () => {
+  const { replaceItem } = await import("../server/engine");
+  const original = await generate({ ...defaultConfig, budget: 10000 });
+  const ids = original.slate.map((p) => p.id);
+  const target = original.slate.find(
+    (p) =>
+      products.filter(
+        (x) => x.category === p.category && x.mission === p.mission,
+      ).length > 1,
+  )!;
+  const result = await replaceItem({
+    config: original.config,
+    ids,
+    targetId: target.id,
+  });
+  assert.equal(result.slate.length, ids.length);
+  for (let i = 0; i < ids.length; i++) {
+    if (ids[i] === target.id) {
+      assert.notEqual(result.slate[i].id, target.id);
+      assert.equal(result.slate[i].category, target.category);
+      assert.equal(result.slate[i].mission, target.mission);
+    } else assert.equal(result.slate[i].id, ids[i]);
+  }
+  assert.deepEqual(result.config.locked, original.config.locked);
+  assert.ok(result.config.dislikes.includes(target.id));
+  assert.ok(result.total <= result.config.budget);
+  assert.equal(new Set(result.slate.map((p) => p.id)).size, ids.length);
+  assert.equal(result.replacement?.targetId, target.id);
+  await assert.rejects(
+    replaceItem({
+      config: original.config,
+      ids: [ids[0], ids[0]],
+      targetId: ids[0],
+    }),
+    /无效/,
+  );
+});
+
+test("failed swaps leave the existing set intact; automatic sets avoid repeated categories", async () => {
+  const { replaceItem } = await import("../server/engine");
+  const original = await generate({ ...appDefaultConfig, budget: 10000 });
+  assert.equal(
+    new Set(original.slate.map((p) => p.category)).size,
+    original.slate.length,
+  );
+  const before = JSON.stringify(original);
+  await assert.rejects(
+    replaceItem({
+      config: { ...original.config, budget: 1 },
+      ids: original.slate.map((p) => p.id),
+      targetId: original.slate[0].id,
+    }),
+    /预算/,
+  );
+  assert.equal(JSON.stringify(original), before);
 });

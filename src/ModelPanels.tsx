@@ -238,7 +238,7 @@ export function ModelCompare({
     );
     const a = document.createElement("a");
     a.href = u;
-    a.download = "recjev-model-comparison.json";
+    a.download = "agenticjev-model-comparison.json";
     a.click();
     setTimeout(() => URL.revokeObjectURL(u), 1000);
   }
