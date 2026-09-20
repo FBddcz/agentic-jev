@@ -1,0 +1,176 @@
+{
+  "fixture": {
+    "query": "周末去公园露营，喜欢轻便自然的装备",
+    "liked": [],
+    "disliked": [],
+    "candidates": [
+      {
+        "id": "tent",
+        "name": "双人帐篷",
+        "category": "庇护",
+        "tags": [
+          "轻便",
+          "防风"
+        ]
+      },
+      {
+        "id": "keyboard",
+        "name": "机械键盘",
+        "category": "输入",
+        "tags": [
+          "办公",
+          "静音"
+        ]
+      }
+    ]
+  },
+  "results": [
+    {
+      "model": "openbmb/MiniCPM5-2B@12a3808a956f",
+      "revision": "12a3808a956f869c767195e9266b59c4d21d92e2",
+      "items": [
+        {
+          "id": "tent",
+          "relevance": 0.8031737804412842,
+          "affinity": 0.9891392641038692
+        },
+        {
+          "id": "keyboard",
+          "relevance": 0.5774953961372375,
+          "affinity": 0.9626205172389746
+        }
+      ],
+      "distributions": [
+        {
+          "id": "tent",
+          "field": "relevance",
+          "probabilities": [
+            0.19682618975639343,
+            0.8031737804412842
+          ],
+          "prompt_sha256": "5dd51e1c1d38027a8259e2794fc97f5ab049c42a15eae2ae329ddd3652f7714a"
+        },
+        {
+          "id": "tent",
+          "field": "affinity",
+          "probabilities": [
+            0.010817511938512325,
+            8.655642886878923e-05,
+            0.9890959858894348
+          ],
+          "prompt_sha256": "ec95cc78e97dfe2c1a5addb94ac8935e6009b012fcc10f98a462300cbfc2b152"
+        },
+        {
+          "id": "keyboard",
+          "field": "relevance",
+          "probabilities": [
+            0.42250463366508484,
+            0.5774953961372375
+          ],
+          "prompt_sha256": "378f96cac48e5a6eb8f7e1e135a5f10ee70eccba181606d58b4a18541d7b1d6a"
+        },
+        {
+          "id": "keyboard",
+          "field": "affinity",
+          "probabilities": [
+            0.03672104328870773,
+            0.0013168267905712128,
+            0.961962103843689
+          ],
+          "prompt_sha256": "8b8facfef4d66212f283d6d9267c5f9286ec863f725cbafd7c63d319e655832c"
+        }
+      ],
+      "readout": "conditional candidate-token softmax; uncalibrated",
+      "usage": {
+        "input_tokens": 674,
+        "output_tokens": 0
+      },
+      "timing": {
+        "mode": "fresh",
+        "device": "mps",
+        "dtype": "torch.float16",
+        "load_seconds": 18.439756625011796,
+        "score_seconds": 3.1413168750004843,
+        "forward_seconds": 3.071574083005544,
+        "forward_calls": 1,
+        "prefix_tokens": 0,
+        "batch_size": 4,
+        "generated_tokens": 0
+      }
+    },
+    {
+      "model": "openbmb/MiniCPM5-2B@12a3808a956f",
+      "revision": "12a3808a956f869c767195e9266b59c4d21d92e2",
+      "items": [
+        {
+          "id": "tent",
+          "relevance": 0.8056321740150452,
+          "affinity": 0.9893071029764542
+        },
+        {
+          "id": "keyboard",
+          "relevance": 0.5774953961372375,
+          "affinity": 0.9631876955972984
+        }
+      ],
+      "distributions": [
+        {
+          "id": "tent",
+          "field": "relevance",
+          "probabilities": [
+            0.19436779618263245,
+            0.8056321740150452
+          ],
+          "prompt_sha256": "5dd51e1c1d38027a8259e2794fc97f5ab049c42a15eae2ae329ddd3652f7714a"
+        },
+        {
+          "id": "tent",
+          "field": "affinity",
+          "probabilities": [
+            0.010651630349457264,
+            8.260690810857341e-05,
+            0.9892657995223999
+          ],
+          "prompt_sha256": "ec95cc78e97dfe2c1a5addb94ac8935e6009b012fcc10f98a462300cbfc2b152"
+        },
+        {
+          "id": "keyboard",
+          "field": "relevance",
+          "probabilities": [
+            0.42250463366508484,
+            0.5774953961372375
+          ],
+          "prompt_sha256": "378f96cac48e5a6eb8f7e1e135a5f10ee70eccba181606d58b4a18541d7b1d6a"
+        },
+        {
+          "id": "keyboard",
+          "field": "affinity",
+          "probabilities": [
+            0.03617379814386368,
+            0.0012770912144333124,
+            0.9625491499900818
+          ],
+          "prompt_sha256": "8b8facfef4d66212f283d6d9267c5f9286ec863f725cbafd7c63d319e655832c"
+        }
+      ],
+      "readout": "conditional candidate-token softmax; uncalibrated",
+      "usage": {
+        "input_tokens": 674,
+        "output_tokens": 0
+      },
+      "timing": {
+        "mode": "shared",
+        "device": "mps",
+        "dtype": "torch.float16",
+        "load_seconds": 0.0,
+        "score_seconds": 1.48652375000529,
+        "forward_seconds": 1.4817241669807117,
+        "forward_calls": 2,
+        "prefix_tokens": 132,
+        "batch_size": 4,
+        "generated_tokens": 0
+      }
+    }
+  ],
+  "note": "Two candidates, one run per path. A correctness/serving smoke test, not a speed benchmark."
+}

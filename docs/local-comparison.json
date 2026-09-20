@@ -1,0 +1,2818 @@
+{
+  "config": {
+    "query": "周末去公园轻露营，想要轻便、自然色系的装备",
+    "mission": "camp",
+    "budget": 1500,
+    "diversity": 0.65,
+    "provider": "baseline",
+    "likes": [],
+    "dislikes": [],
+    "locked": [],
+    "ads": true,
+    "adWeight": 0.3
+  },
+  "createdAt": "2026-09-20T07:27:28.084Z",
+  "results": [
+    {
+      "provider": "baseline",
+      "run": {
+        "id": "dac12091-32e2-43d1-a6cd-658a6a161662",
+        "createdAt": "2026-09-20T07:26:49.884Z",
+        "config": {
+          "query": "周末去公园轻露营，想要轻便、自然色系的装备",
+          "mission": "camp",
+          "budget": 1500,
+          "diversity": 0.65,
+          "provider": "baseline",
+          "likes": [],
+          "dislikes": [],
+          "locked": [],
+          "ads": true,
+          "adWeight": 0.3
+        },
+        "mission": "camp",
+        "candidates": [
+          {
+            "id": "c05",
+            "name": "云顶 · 六角天幕",
+            "subtitle": "涂银防晒 / 公园野餐",
+            "price": 399,
+            "category": "庇护",
+            "mission": "camp",
+            "art": "tent",
+            "color": "#e0cead",
+            "tags": [
+              "防晒",
+              "自然",
+              "野餐"
+            ],
+            "quality": 0.85,
+            "bid": 1.5,
+            "brand": "云顶",
+            "evidence": {
+              "id": "c05",
+              "relevance": 0.8999999999999999,
+              "affinity": 0.6625,
+              "confidence": null,
+              "lexical": 1,
+              "source": "baseline"
+            },
+            "rankScore": 0.8427499999999999,
+            "reason": "呼应当前场景 · 防晒 / 自然"
+          },
+          {
+            "id": "c01",
+            "name": "栖野 · 双人轻帐",
+            "subtitle": "轻量铝杆 / 双层透气",
+            "price": 569,
+            "category": "庇护",
+            "mission": "camp",
+            "art": "tent",
+            "color": "#b8c597",
+            "tags": [
+              "轻便",
+              "自然",
+              "防风"
+            ],
+            "quality": 0.91,
+            "bid": 1.8,
+            "brand": "栖野",
+            "evidence": {
+              "id": "c01",
+              "relevance": 0.8060929968301573,
+              "affinity": 0.6775,
+              "confidence": null,
+              "lexical": 0.6869766561005245,
+              "source": "baseline"
+            },
+            "rankScore": 0.788193237844507,
+            "reason": "呼应当前场景 · 轻便 / 自然"
+          },
+          {
+            "id": "c04",
+            "name": "远山 · 真空随行杯",
+            "subtitle": "600ml / 轻量保温",
+            "price": 129,
+            "category": "饮水",
+            "mission": "camp",
+            "art": "bottle",
+            "color": "#8c9f83",
+            "tags": [
+              "轻便",
+              "自然",
+              "保温"
+            ],
+            "quality": 0.87,
+            "bid": 0.8,
+            "brand": "远山",
+            "evidence": {
+              "id": "c04",
+              "relevance": 0.8112357980449579,
+              "affinity": 0.6675,
+              "confidence": null,
+              "lexical": 0.7041193268165264,
+              "source": "baseline"
+            },
+            "rankScore": 0.7854903426705714,
+            "reason": "呼应当前场景 · 轻便 / 自然"
+          },
+          {
+            "id": "c12",
+            "name": "暖夜 · 双光营灯",
+            "subtitle": "防水外壳 / 长时续航",
+            "price": 239,
+            "category": "照明",
+            "mission": "camp",
+            "art": "lantern",
+            "color": "#7c8d70",
+            "tags": [
+              "耐用",
+              "自然",
+              "暖光"
+            ],
+            "quality": 0.96,
+            "bid": 1.1,
+            "brand": "暖夜",
+            "evidence": {
+              "id": "c12",
+              "relevance": 0.7770394859633567,
+              "affinity": 0.69,
+              "confidence": null,
+              "lexical": 0.5901316198778558,
+              "source": "baseline"
+            },
+            "rankScore": 0.7761868504550825,
+            "reason": "呼应当前场景 · 耐用 / 自然"
+          },
+          {
+            "id": "c10",
+            "name": "极光 · 专业徒步帐",
+            "subtitle": "轻量骨架 / 四季防风",
+            "price": 1199,
+            "category": "庇护",
+            "mission": "camp",
+            "art": "tent",
+            "color": "#df9e63",
+            "tags": [
+              "轻便",
+              "耐用",
+              "专业"
+            ],
+            "quality": 0.97,
+            "bid": 2.4,
+            "brand": "极光",
+            "evidence": {
+              "id": "c10",
+              "relevance": 0.7694699095761515,
+              "affinity": 0.6925,
+              "confidence": null,
+              "lexical": 0.5648996985871717,
+              "source": "baseline"
+            },
+            "rankScore": 0.772589538511783,
+            "reason": "呼应当前场景 · 轻便 / 耐用"
+          },
+          {
+            "id": "c02",
+            "name": "林间 · 折叠月亮椅",
+            "subtitle": "榉木扶手 / 一折即走",
+            "price": 219,
+            "category": "座椅",
+            "mission": "camp",
+            "art": "chair",
+            "color": "#d9ba83",
+            "tags": [
+              "舒适",
+              "自然",
+              "便携"
+            ],
+            "quality": 0.9,
+            "bid": 1.2,
+            "brand": "林间",
+            "evidence": {
+              "id": "c02",
+              "relevance": 0.7728316812793684,
+              "affinity": 0.675,
+              "confidence": null,
+              "lexical": 0.5761056042645615,
+              "source": "baseline"
+            },
+            "rankScore": 0.7640255432699706,
+            "reason": "呼应当前场景 · 舒适 / 自然"
+          },
+          {
+            "id": "c03",
+            "name": "萤火 · 复古营地灯",
+            "subtitle": "暖光三档 / USB-C 充电",
+            "price": 159,
+            "category": "照明",
+            "mission": "camp",
+            "art": "lantern",
+            "color": "#d4a568",
+            "tags": [
+              "暖光",
+              "复古",
+              "自然"
+            ],
+            "quality": 0.88,
+            "bid": 0,
+            "brand": "萤火",
+            "evidence": {
+              "id": "c03",
+              "relevance": 0.7728316812793684,
+              "affinity": 0.67,
+              "confidence": null,
+              "lexical": 0.5761056042645615,
+              "source": "baseline"
+            },
+            "rankScore": 0.7609255432699705,
+            "reason": "呼应当前场景 · 暖光 / 复古"
+          },
+          {
+            "id": "c09",
+            "name": "晴日 · 野餐垫",
+            "subtitle": "防潮底层 / 可机洗",
+            "price": 139,
+            "category": "收纳",
+            "mission": "camp",
+            "art": "mat",
+            "color": "#c89474",
+            "tags": [
+              "自然",
+              "野餐",
+              "舒适"
+            ],
+            "quality": 0.82,
+            "bid": 1,
+            "brand": "晴日",
+            "evidence": {
+              "id": "c09",
+              "relevance": 0.7861012226856517,
+              "affinity": 0.655,
+              "confidence": null,
+              "lexical": 0.6203374089521725,
+              "source": "baseline"
+            },
+            "rankScore": 0.7606488314262432,
+            "reason": "呼应当前场景 · 自然 / 野餐"
+          },
+          {
+            "id": "c07",
+            "name": "星点 · 口袋小灯",
+            "subtitle": "磁吸底座 / 仅 86g",
+            "price": 89,
+            "category": "照明",
+            "mission": "camp",
+            "art": "lantern",
+            "color": "#9ba6ac",
+            "tags": [
+              "轻便",
+              "简约",
+              "磁吸"
+            ],
+            "quality": 0.79,
+            "bid": 0.5,
+            "brand": "星点",
+            "evidence": {
+              "id": "c07",
+              "relevance": 0.7779277424015787,
+              "affinity": 0.6475,
+              "confidence": null,
+              "lexical": 0.593092474671929,
+              "source": "baseline"
+            },
+            "rankScore": 0.7504408648330736,
+            "reason": "呼应当前场景 · 轻便 / 简约"
+          },
+          {
+            "id": "c08",
+            "name": "溪流 · 便携水壶",
+            "subtitle": "1L / 大口径易清洗",
+            "price": 79,
+            "category": "饮水",
+            "mission": "camp",
+            "art": "bottle",
+            "color": "#dfc5a3",
+            "tags": [
+              "轻便",
+              "实惠",
+              "耐用"
+            ],
+            "quality": 0.8,
+            "bid": 0,
+            "brand": "溪流",
+            "evidence": {
+              "id": "c08",
+              "relevance": 0.773595867699286,
+              "affinity": 0.65,
+              "confidence": null,
+              "lexical": 0.5786528923309533,
+              "source": "baseline"
+            },
+            "rankScore": 0.7490451900355146,
+            "reason": "呼应当前场景 · 轻便 / 实惠"
+          },
+          {
+            "id": "c06",
+            "name": "岩石 · 战术折叠椅",
+            "subtitle": "加厚骨架 / 稳定承重",
+            "price": 289,
+            "category": "座椅",
+            "mission": "camp",
+            "art": "chair",
+            "color": "#596b60",
+            "tags": [
+              "耐用",
+              "深色",
+              "稳定"
+            ],
+            "quality": 0.94,
+            "bid": 2.1,
+            "brand": "岩石",
+            "evidence": {
+              "id": "c06",
+              "relevance": 0.7411069310979104,
+              "affinity": 0.685,
+              "confidence": null,
+              "lexical": 0.47035643699303475,
+              "source": "baseline"
+            },
+            "rankScore": 0.7486527131465791,
+            "reason": "呼应当前场景 · 耐用 / 深色"
+          },
+          {
+            "id": "c11",
+            "name": "微风 · 迷你折叠凳",
+            "subtitle": "铝合金 / 收纳小巧",
+            "price": 69,
+            "category": "座椅",
+            "mission": "camp",
+            "art": "chair",
+            "color": "#a8b79d",
+            "tags": [
+              "轻便",
+              "实惠",
+              "便携"
+            ],
+            "quality": 0.73,
+            "bid": 0,
+            "brand": "微风",
+            "evidence": {
+              "id": "c11",
+              "relevance": 0.773595867699286,
+              "affinity": 0.6325000000000001,
+              "confidence": null,
+              "lexical": 0.5786528923309533,
+              "source": "baseline"
+            },
+            "rankScore": 0.7381951900355145,
+            "reason": "呼应当前场景 · 轻便 / 实惠"
+          },
+          {
+            "id": "u01",
+            "name": "行迹 · 通勤双肩包",
+            "subtitle": "18L / 防泼水面料",
+            "price": 399,
+            "category": "携带",
+            "mission": "commute",
+            "art": "bag",
+            "color": "#8c9d83",
+            "tags": [
+              "轻便",
+              "耐用",
+              "自然"
+            ],
+            "quality": 0.92,
+            "bid": 1.8,
+            "brand": "行迹",
+            "evidence": {
+              "id": "u01",
+              "relevance": 0.14308656169816839,
+              "affinity": 0.68,
+              "confidence": null,
+              "lexical": 0.2102885389938946,
+              "source": "baseline"
+            },
+            "rankScore": 0.33889886195475455,
+            "reason": "跨场景发现 · 轻便 / 耐用"
+          },
+          {
+            "id": "u05",
+            "name": "漫步 · 帆布托特包",
+            "subtitle": "加宽肩带 / 电脑夹层",
+            "price": 169,
+            "category": "携带",
+            "mission": "commute",
+            "art": "bag",
+            "color": "#c3ac88",
+            "tags": [
+              "自然",
+              "轻便",
+              "实惠"
+            ],
+            "quality": 0.82,
+            "bid": 1.3,
+            "brand": "漫步",
+            "evidence": {
+              "id": "u05",
+              "relevance": 0.14155063999767192,
+              "affinity": 0.655,
+              "confidence": null,
+              "lexical": 0.2051687999922398,
+              "source": "baseline"
+            },
+            "rankScore": 0.32235443519841694,
+            "reason": "跨场景发现 · 自然 / 轻便"
+          },
+          {
+            "id": "f12",
+            "name": "晨光 · 马克杯",
+            "subtitle": "宽口杯型 / 温润陶瓷",
+            "price": 139,
+            "category": "饮用",
+            "mission": "coffee",
+            "art": "cup",
+            "color": "#dfb695",
+            "tags": [
+              "自然",
+              "舒适",
+              "复古"
+            ],
+            "quality": 0.94,
+            "bid": 0.8,
+            "brand": "晨光",
+            "evidence": {
+              "id": "f12",
+              "relevance": 0.11330805564337923,
+              "affinity": 0.685,
+              "confidence": null,
+              "lexical": 0.1110268521445974,
+              "source": "baseline"
+            },
+            "rankScore": 0.32174947783749785,
+            "reason": "跨场景发现 · 自然 / 舒适"
+          },
+          {
+            "id": "d08",
+            "name": "木序 · 显示器增高架",
+            "subtitle": "实木 / 底部可收纳",
+            "price": 259,
+            "category": "支撑",
+            "mission": "desk",
+            "art": "stand",
+            "color": "#bd926a",
+            "tags": [
+              "自然",
+              "舒适",
+              "复古"
+            ],
+            "quality": 0.93,
+            "bid": 1.2,
+            "brand": "木序",
+            "evidence": {
+              "id": "d08",
+              "relevance": 0.11172475018145803,
+              "affinity": 0.6825,
+              "confidence": null,
+              "lexical": 0.10574916727152672,
+              "source": "baseline"
+            },
+            "rankScore": 0.3191228301233915,
+            "reason": "跨场景发现 · 自然 / 舒适"
+          },
+          {
+            "id": "f02",
+            "name": "细流 · 手冲壶",
+            "subtitle": "600ml / 精细控流",
+            "price": 219,
+            "category": "冲煮",
+            "mission": "coffee",
+            "art": "kettle",
+            "color": "#c8b394",
+            "tags": [
+              "自然",
+              "简约",
+              "入门"
+            ],
+            "quality": 0.9,
+            "bid": 0.9,
+            "brand": "细流",
+            "evidence": {
+              "id": "f02",
+              "relevance": 0.11505770058962676,
+              "affinity": 0.675,
+              "confidence": null,
+              "lexical": 0.11685900196542254,
+              "source": "baseline"
+            },
+            "rankScore": 0.31673923640094626,
+            "reason": "跨场景发现 · 自然 / 简约"
+          },
+          {
+            "id": "f01",
+            "name": "研物 · 手摇磨豆机",
+            "subtitle": "不锈钢磨芯 / 分档研磨",
+            "price": 299,
+            "category": "研磨",
+            "mission": "coffee",
+            "art": "grinder",
+            "color": "#a4866c",
+            "tags": [
+              "自然",
+              "复古",
+              "入门"
+            ],
+            "quality": 0.91,
+            "bid": 1.2,
+            "brand": "研物",
+            "evidence": {
+              "id": "f01",
+              "relevance": 0.11098823405514731,
+              "affinity": 0.6775,
+              "confidence": null,
+              "lexical": 0.10329411351715768,
+              "source": "baseline"
+            },
+            "rankScore": 0.3155219991575002,
+            "reason": "跨场景发现 · 自然 / 复古"
+          },
+          {
+            "id": "d12",
+            "name": "晴窗 · 桌面音箱",
+            "subtitle": "立体声 / 蓝牙连接",
+            "price": 329,
+            "category": "聆听",
+            "mission": "desk",
+            "art": "speaker",
+            "color": "#c59b77",
+            "tags": [
+              "自然",
+              "复古",
+              "舒适"
+            ],
+            "quality": 0.87,
+            "bid": 1.1,
+            "brand": "晴窗",
+            "evidence": {
+              "id": "d12",
+              "relevance": 0.11330805564337923,
+              "affinity": 0.6675,
+              "confidence": null,
+              "lexical": 0.1110268521445974,
+              "source": "baseline"
+            },
+            "rankScore": 0.3108994778374979,
+            "reason": "跨场景发现 · 自然 / 复古"
+          },
+          {
+            "id": "f03",
+            "name": "云杯 · 手作陶杯",
+            "subtitle": "哑光釉面 / 300ml",
+            "price": 89,
+            "category": "饮用",
+            "mission": "coffee",
+            "art": "cup",
+            "color": "#c3c6a9",
+            "tags": [
+              "自然",
+              "舒适",
+              "复古"
+            ],
+            "quality": 0.86,
+            "bid": 0.5,
+            "brand": "云杯",
+            "evidence": {
+              "id": "f03",
+              "relevance": 0.11416048929491593,
+              "affinity": 0.665,
+              "confidence": null,
+              "lexical": 0.11386829764971979,
+              "source": "baseline"
+            },
+            "rankScore": 0.30992913272054284,
+            "reason": "跨场景发现 · 自然 / 舒适"
+          },
+          {
+            "id": "d03",
+            "name": "序 · 模块收纳盘",
+            "subtitle": "再生材质 / 自由组合",
+            "price": 89,
+            "category": "收纳",
+            "mission": "desk",
+            "art": "tray",
+            "color": "#b9957d",
+            "tags": [
+              "自然",
+              "简约",
+              "收纳"
+            ],
+            "quality": 0.85,
+            "bid": 0,
+            "brand": "序",
+            "evidence": {
+              "id": "d03",
+              "relevance": 0.11172475018145803,
+              "affinity": 0.6625,
+              "confidence": null,
+              "lexical": 0.10574916727152672,
+              "source": "baseline"
+            },
+            "rankScore": 0.30672283012339147,
+            "reason": "跨场景发现 · 自然 / 简约"
+          },
+          {
+            "id": "f11",
+            "name": "木纹 · 胡桃木托盘",
+            "subtitle": "圆角实木 / 咖啡角收纳",
+            "price": 119,
+            "category": "收纳",
+            "mission": "coffee",
+            "art": "tray",
+            "color": "#b38761",
+            "tags": [
+              "自然",
+              "复古",
+              "收纳"
+            ],
+            "quality": 0.85,
+            "bid": 0.5,
+            "brand": "木纹",
+            "evidence": {
+              "id": "f11",
+              "relevance": 0.11098823405514731,
+              "affinity": 0.6625,
+              "confidence": null,
+              "lexical": 0.10329411351715768,
+              "source": "baseline"
+            },
+            "rankScore": 0.3062219991575002,
+            "reason": "跨场景发现 · 自然 / 复古"
+          },
+          {
+            "id": "d06",
+            "name": "纸月 · 球形氛围灯",
+            "subtitle": "纸感灯罩 / 柔和暖光",
+            "price": 199,
+            "category": "照明",
+            "mission": "desk",
+            "art": "lamp",
+            "color": "#e9dac1",
+            "tags": [
+              "自然",
+              "暖光",
+              "复古"
+            ],
+            "quality": 0.84,
+            "bid": 1.7,
+            "brand": "纸月",
+            "evidence": {
+              "id": "d06",
+              "relevance": 0.11172475018145803,
+              "affinity": 0.66,
+              "confidence": null,
+              "lexical": 0.10574916727152672,
+              "source": "baseline"
+            },
+            "rankScore": 0.30517283012339147,
+            "reason": "跨场景发现 · 自然 / 暖光"
+          },
+          {
+            "id": "d10",
+            "name": "小丘 · 护腕垫",
+            "subtitle": "慢回弹 / 棉麻外套",
+            "price": 59,
+            "category": "支撑",
+            "mission": "desk",
+            "art": "mat",
+            "color": "#bdbda0",
+            "tags": [
+              "舒适",
+              "自然",
+              "实惠"
+            ],
+            "quality": 0.78,
+            "bid": 0,
+            "brand": "小丘",
+            "evidence": {
+              "id": "d10",
+              "relevance": 0.11416048929491593,
+              "affinity": 0.645,
+              "confidence": null,
+              "lexical": 0.11386829764971979,
+              "source": "baseline"
+            },
+            "rankScore": 0.2975291327205428,
+            "reason": "跨场景发现 · 舒适 / 自然"
+          }
+        ],
+        "slate": [
+          {
+            "id": "c05",
+            "name": "云顶 · 六角天幕",
+            "subtitle": "涂银防晒 / 公园野餐",
+            "price": 399,
+            "category": "庇护",
+            "mission": "camp",
+            "art": "tent",
+            "color": "#e0cead",
+            "tags": [
+              "防晒",
+              "自然",
+              "野餐"
+            ],
+            "quality": 0.85,
+            "bid": 1.5,
+            "brand": "云顶",
+            "evidence": {
+              "id": "c05",
+              "relevance": 0.8999999999999999,
+              "affinity": 0.6625,
+              "confidence": null,
+              "lexical": 1,
+              "source": "baseline"
+            },
+            "rankScore": 0.8427499999999999,
+            "reason": "呼应当前场景 · 防晒 / 自然"
+          },
+          {
+            "id": "c04",
+            "name": "远山 · 真空随行杯",
+            "subtitle": "600ml / 轻量保温",
+            "price": 129,
+            "category": "饮水",
+            "mission": "camp",
+            "art": "bottle",
+            "color": "#8c9f83",
+            "tags": [
+              "轻便",
+              "自然",
+              "保温"
+            ],
+            "quality": 0.87,
+            "bid": 0.8,
+            "brand": "远山",
+            "evidence": {
+              "id": "c04",
+              "relevance": 0.8112357980449579,
+              "affinity": 0.6675,
+              "confidence": null,
+              "lexical": 0.7041193268165264,
+              "source": "baseline"
+            },
+            "rankScore": 0.7854903426705714,
+            "reason": "呼应当前场景 · 轻便 / 自然"
+          },
+          {
+            "id": "c12",
+            "name": "暖夜 · 双光营灯",
+            "subtitle": "防水外壳 / 长时续航",
+            "price": 239,
+            "category": "照明",
+            "mission": "camp",
+            "art": "lantern",
+            "color": "#7c8d70",
+            "tags": [
+              "耐用",
+              "自然",
+              "暖光"
+            ],
+            "quality": 0.96,
+            "bid": 1.1,
+            "brand": "暖夜",
+            "evidence": {
+              "id": "c12",
+              "relevance": 0.7770394859633567,
+              "affinity": 0.69,
+              "confidence": null,
+              "lexical": 0.5901316198778558,
+              "source": "baseline"
+            },
+            "rankScore": 0.7761868504550825,
+            "reason": "呼应当前场景 · 耐用 / 自然"
+          },
+          {
+            "id": "c02",
+            "name": "林间 · 折叠月亮椅",
+            "subtitle": "榉木扶手 / 一折即走",
+            "price": 219,
+            "category": "座椅",
+            "mission": "camp",
+            "art": "chair",
+            "color": "#d9ba83",
+            "tags": [
+              "舒适",
+              "自然",
+              "便携"
+            ],
+            "quality": 0.9,
+            "bid": 1.2,
+            "brand": "林间",
+            "evidence": {
+              "id": "c02",
+              "relevance": 0.7728316812793684,
+              "affinity": 0.675,
+              "confidence": null,
+              "lexical": 0.5761056042645615,
+              "source": "baseline"
+            },
+            "rankScore": 0.7640255432699706,
+            "reason": "呼应当前场景 · 舒适 / 自然"
+          }
+        ],
+        "greedy": [
+          {
+            "id": "c05",
+            "name": "云顶 · 六角天幕",
+            "subtitle": "涂银防晒 / 公园野餐",
+            "price": 399,
+            "category": "庇护",
+            "mission": "camp",
+            "art": "tent",
+            "color": "#e0cead",
+            "tags": [
+              "防晒",
+              "自然",
+              "野餐"
+            ],
+            "quality": 0.85,
+            "bid": 1.5,
+            "brand": "云顶",
+            "evidence": {
+              "id": "c05",
+              "relevance": 0.8999999999999999,
+              "affinity": 0.6625,
+              "confidence": null,
+              "lexical": 1,
+              "source": "baseline"
+            },
+            "rankScore": 0.8427499999999999,
+            "reason": "呼应当前场景 · 防晒 / 自然"
+          },
+          {
+            "id": "c01",
+            "name": "栖野 · 双人轻帐",
+            "subtitle": "轻量铝杆 / 双层透气",
+            "price": 569,
+            "category": "庇护",
+            "mission": "camp",
+            "art": "tent",
+            "color": "#b8c597",
+            "tags": [
+              "轻便",
+              "自然",
+              "防风"
+            ],
+            "quality": 0.91,
+            "bid": 1.8,
+            "brand": "栖野",
+            "evidence": {
+              "id": "c01",
+              "relevance": 0.8060929968301573,
+              "affinity": 0.6775,
+              "confidence": null,
+              "lexical": 0.6869766561005245,
+              "source": "baseline"
+            },
+            "rankScore": 0.788193237844507,
+            "reason": "呼应当前场景 · 轻便 / 自然"
+          },
+          {
+            "id": "c04",
+            "name": "远山 · 真空随行杯",
+            "subtitle": "600ml / 轻量保温",
+            "price": 129,
+            "category": "饮水",
+            "mission": "camp",
+            "art": "bottle",
+            "color": "#8c9f83",
+            "tags": [
+              "轻便",
+              "自然",
+              "保温"
+            ],
+            "quality": 0.87,
+            "bid": 0.8,
+            "brand": "远山",
+            "evidence": {
+              "id": "c04",
+              "relevance": 0.8112357980449579,
+              "affinity": 0.6675,
+              "confidence": null,
+              "lexical": 0.7041193268165264,
+              "source": "baseline"
+            },
+            "rankScore": 0.7854903426705714,
+            "reason": "呼应当前场景 · 轻便 / 自然"
+          },
+          {
+            "id": "c12",
+            "name": "暖夜 · 双光营灯",
+            "subtitle": "防水外壳 / 长时续航",
+            "price": 239,
+            "category": "照明",
+            "mission": "camp",
+            "art": "lantern",
+            "color": "#7c8d70",
+            "tags": [
+              "耐用",
+              "自然",
+              "暖光"
+            ],
+            "quality": 0.96,
+            "bid": 1.1,
+            "brand": "暖夜",
+            "evidence": {
+              "id": "c12",
+              "relevance": 0.7770394859633567,
+              "affinity": 0.69,
+              "confidence": null,
+              "lexical": 0.5901316198778558,
+              "source": "baseline"
+            },
+            "rankScore": 0.7761868504550825,
+            "reason": "呼应当前场景 · 耐用 / 自然"
+          }
+        ],
+        "auction": {
+          "winner": {
+            "id": "c10",
+            "name": "极光 · 专业徒步帐",
+            "subtitle": "轻量骨架 / 四季防风",
+            "price": 1199,
+            "category": "庇护",
+            "mission": "camp",
+            "art": "tent",
+            "color": "#df9e63",
+            "tags": [
+              "轻便",
+              "耐用",
+              "专业"
+            ],
+            "quality": 0.97,
+            "bid": 2.4,
+            "brand": "极光",
+            "evidence": {
+              "id": "c10",
+              "relevance": 0.7694699095761515,
+              "affinity": 0.6925,
+              "confidence": null,
+              "lexical": 0.5648996985871717,
+              "source": "baseline"
+            },
+            "rankScore": 0.772589538511783,
+            "reason": "呼应当前场景 · 轻便 / 耐用"
+          },
+          "cpc": 2.01,
+          "rows": [
+            {
+              "id": "c10",
+              "bid": 2.4,
+              "pctr": 0.05895,
+              "value": 0.11864922196478372,
+              "eligible": true
+            },
+            {
+              "id": "c06",
+              "bid": 2.1,
+              "pctr": 0.0579,
+              "value": 0.09955483422653644,
+              "eligible": true
+            },
+            {
+              "id": "c01",
+              "bid": 1.8,
+              "pctr": 0.056850000000000005,
+              "value": 0.08844024745594102,
+              "eligible": true
+            },
+            {
+              "id": "c09",
+              "bid": 1,
+              "pctr": 0.0537,
+              "value": 0.04565954496075364,
+              "eligible": true
+            },
+            {
+              "id": "u01",
+              "bid": 1.8,
+              "pctr": 0.05720000000000001,
+              "value": 0.0412005346747104,
+              "eligible": false
+            },
+            {
+              "id": "d06",
+              "bid": 1.7,
+              "pctr": 0.054400000000000004,
+              "value": 0.03497661342774687,
+              "eligible": false
+            },
+            {
+              "id": "u05",
+              "bid": 1.3,
+              "pctr": 0.0537,
+              "value": 0.027860155124766233,
+              "eligible": false
+            },
+            {
+              "id": "d08",
+              "bid": 1.2,
+              "pctr": 0.057550000000000004,
+              "value": 0.026118997873272046,
+              "eligible": false
+            },
+            {
+              "id": "f01",
+              "bid": 1.2,
+              "pctr": 0.056850000000000005,
+              "value": 0.025766132129069506,
+              "eligible": false
+            },
+            {
+              "id": "d12",
+              "bid": 1.1,
+              "pctr": 0.05545,
+              "value": 0.023136357397777543,
+              "eligible": false
+            },
+            {
+              "id": "c07",
+              "bid": 0.5,
+              "pctr": 0.05265,
+              "value": 0.02223276347310509,
+              "eligible": true
+            },
+            {
+              "id": "f02",
+              "bid": 0.9,
+              "pctr": 0.05650000000000001,
+              "value": 0.01935047885248777,
+              "eligible": false
+            },
+            {
+              "id": "f12",
+              "bid": 0.8,
+              "pctr": 0.0579,
+              "value": 0.01756990039618093,
+              "eligible": false
+            },
+            {
+              "id": "f03",
+              "bid": 0.5,
+              "pctr": 0.0551,
+              "value": 0.010466585036052453,
+              "eligible": false
+            },
+            {
+              "id": "f11",
+              "bid": 0.5,
+              "pctr": 0.05475000000000001,
+              "value": 0.01033931203508176,
+              "eligible": false
+            }
+          ],
+          "note": "独立赞助位 · 模拟质量加权二价竞价；pCTR 来自固定演示公式，非 Jev 概率。不产生扣费。"
+        },
+        "total": 986,
+        "coverage": 1,
+        "objective": 5.248452736395624,
+        "warnings": [
+          "本次使用本地启发式评分，模型调用为 0；评分不是校准概率。"
+        ],
+        "model": "local-heuristic-v1",
+        "modelCalls": 0,
+        "modelLatency": 0,
+        "usage": null,
+        "rawAnswers": null,
+        "totalLatency": 5.669625000009546,
+        "version": "recjev-v0.1-catalog1-rubric1",
+        "trace": [
+          {
+            "name": "召回候选",
+            "detail": "BM25 + 场景召回 · 48 → 24 件",
+            "ms": 2.4498750000057044
+          },
+          {
+            "name": "候选评分",
+            "detail": "本地相关性 + 反馈偏好 · 0 次模型调用",
+            "ms": 0
+          },
+          {
+            "name": "生成组合",
+            "detail": "Beam search · 宽度 40 · 预算硬约束 · 最多 4 件",
+            "ms": 3.1459170000016456
+          },
+          {
+            "name": "赞助竞价",
+            "detail": "独立赞助位 · 相关性门槛 0.55",
+            "ms": 0
+          }
+        ]
+      },
+      "error": null,
+      "elapsed": 5.688916999992216
+    },
+    {
+      "provider": "minicpm",
+      "run": {
+        "id": "eb982042-e23f-41e0-943a-54de2d92f289",
+        "createdAt": "2026-09-20T07:27:28.082Z",
+        "config": {
+          "query": "周末去公园轻露营，想要轻便、自然色系的装备",
+          "mission": "camp",
+          "budget": 1500,
+          "diversity": 0.65,
+          "provider": "minicpm",
+          "likes": [],
+          "dislikes": [],
+          "locked": [],
+          "ads": true,
+          "adWeight": 0.3
+        },
+        "mission": "camp",
+        "candidates": [
+          {
+            "id": "c03",
+            "name": "萤火 · 复古营地灯",
+            "subtitle": "暖光三档 / USB-C 充电",
+            "price": 159,
+            "category": "照明",
+            "mission": "camp",
+            "art": "lantern",
+            "color": "#d4a568",
+            "tags": [
+              "暖光",
+              "复古",
+              "自然"
+            ],
+            "quality": 0.88,
+            "bid": 0,
+            "brand": "萤火",
+            "evidence": {
+              "id": "c03",
+              "relevance": 0.49218809604644775,
+              "affinity": 0.9758519190800143,
+              "confidence": null,
+              "lexical": 0.5761056042645615,
+              "source": "local-logits"
+            },
+            "rankScore": 0.6373753275091876,
+            "reason": "呼应当前场景 · 暖光 / 复古"
+          },
+          {
+            "id": "c09",
+            "name": "晴日 · 野餐垫",
+            "subtitle": "防潮底层 / 可机洗",
+            "price": 139,
+            "category": "收纳",
+            "mission": "camp",
+            "art": "mat",
+            "color": "#c89474",
+            "tags": [
+              "自然",
+              "野餐",
+              "舒适"
+            ],
+            "quality": 0.82,
+            "bid": 1,
+            "brand": "晴日",
+            "evidence": {
+              "id": "c09",
+              "relevance": 0.4843800663948059,
+              "affinity": 0.9845576899442676,
+              "confidence": null,
+              "lexical": 0.6203374089521725,
+              "source": "local-logits"
+            },
+            "rankScore": 0.6279811369362068,
+            "reason": "呼应当前场景 · 自然 / 野餐"
+          },
+          {
+            "id": "c12",
+            "name": "暖夜 · 双光营灯",
+            "subtitle": "防水外壳 / 长时续航",
+            "price": 239,
+            "category": "照明",
+            "mission": "camp",
+            "art": "lantern",
+            "color": "#7c8d70",
+            "tags": [
+              "耐用",
+              "自然",
+              "暖光"
+            ],
+            "quality": 0.96,
+            "bid": 1.1,
+            "brand": "暖夜",
+            "evidence": {
+              "id": "c12",
+              "relevance": 0.46490153670310974,
+              "affinity": 0.9642259212778299,
+              "confidence": null,
+              "lexical": 0.5901316198778558,
+              "source": "local-logits"
+            },
+            "rankScore": 0.6242627476392372,
+            "reason": "呼应当前场景 · 耐用 / 自然"
+          },
+          {
+            "id": "c08",
+            "name": "溪流 · 便携水壶",
+            "subtitle": "1L / 大口径易清洗",
+            "price": 79,
+            "category": "饮水",
+            "mission": "camp",
+            "art": "bottle",
+            "color": "#dfc5a3",
+            "tags": [
+              "轻便",
+              "实惠",
+              "耐用"
+            ],
+            "quality": 0.8,
+            "bid": 0,
+            "brand": "溪流",
+            "evidence": {
+              "id": "c08",
+              "relevance": 0.47268348932266235,
+              "affinity": 0.9705272133433027,
+              "confidence": null,
+              "lexical": 0.5786528923309533,
+              "source": "local-logits"
+            },
+            "rankScore": 0.614940759674937,
+            "reason": "呼应当前场景 · 轻便 / 实惠"
+          },
+          {
+            "id": "c01",
+            "name": "栖野 · 双人轻帐",
+            "subtitle": "轻量铝杆 / 双层透气",
+            "price": 569,
+            "category": "庇护",
+            "mission": "camp",
+            "art": "tent",
+            "color": "#b8c597",
+            "tags": [
+              "轻便",
+              "自然",
+              "防风"
+            ],
+            "quality": 0.91,
+            "bid": 1.8,
+            "brand": "栖野",
+            "evidence": {
+              "id": "c01",
+              "relevance": 0.45713669061660767,
+              "affinity": 0.9597058293147711,
+              "confidence": null,
+              "lexical": 0.6869766561005245,
+              "source": "local-logits"
+            },
+            "rankScore": 0.6129882320685428,
+            "reason": "呼应当前场景 · 轻便 / 自然"
+          },
+          {
+            "id": "c07",
+            "name": "星点 · 口袋小灯",
+            "subtitle": "磁吸底座 / 仅 86g",
+            "price": 89,
+            "category": "照明",
+            "mission": "camp",
+            "art": "lantern",
+            "color": "#9ba6ac",
+            "tags": [
+              "轻便",
+              "简约",
+              "磁吸"
+            ],
+            "quality": 0.79,
+            "bid": 0.5,
+            "brand": "星点",
+            "evidence": {
+              "id": "c07",
+              "relevance": 0.4378235340118408,
+              "affinity": 0.9732143593300862,
+              "confidence": null,
+              "lexical": 0.593092474671929,
+              "source": "local-logits"
+            },
+            "rankScore": 0.5908271621806707,
+            "reason": "呼应当前场景 · 轻便 / 简约"
+          },
+          {
+            "id": "c02",
+            "name": "林间 · 折叠月亮椅",
+            "subtitle": "榉木扶手 / 一折即走",
+            "price": 219,
+            "category": "座椅",
+            "mission": "camp",
+            "art": "chair",
+            "color": "#d9ba83",
+            "tags": [
+              "舒适",
+              "自然",
+              "便携"
+            ],
+            "quality": 0.9,
+            "bid": 1.2,
+            "brand": "林间",
+            "evidence": {
+              "id": "c02",
+              "relevance": 0.4148988127708435,
+              "affinity": 0.9743314533989178,
+              "confidence": null,
+              "lexical": 0.5761056042645615,
+              "source": "local-logits"
+            },
+            "rankScore": 0.5864841124319354,
+            "reason": "呼应当前场景 · 舒适 / 自然"
+          },
+          {
+            "id": "c11",
+            "name": "微风 · 迷你折叠凳",
+            "subtitle": "铝合金 / 收纳小巧",
+            "price": 69,
+            "category": "座椅",
+            "mission": "camp",
+            "art": "chair",
+            "color": "#a8b79d",
+            "tags": [
+              "轻便",
+              "实惠",
+              "便携"
+            ],
+            "quality": 0.73,
+            "bid": 0,
+            "brand": "微风",
+            "evidence": {
+              "id": "c11",
+              "relevance": 0.39981159567832947,
+              "affinity": 0.9776218010883895,
+              "confidence": null,
+              "lexical": 0.5786528923309533,
+              "source": "local-logits"
+            },
+            "rankScore": 0.5599486813007097,
+            "reason": "呼应当前场景 · 轻便 / 实惠"
+          },
+          {
+            "id": "c10",
+            "name": "极光 · 专业徒步帐",
+            "subtitle": "轻量骨架 / 四季防风",
+            "price": 1199,
+            "category": "庇护",
+            "mission": "camp",
+            "art": "tent",
+            "color": "#df9e63",
+            "tags": [
+              "轻便",
+              "耐用",
+              "专业"
+            ],
+            "quality": 0.97,
+            "bid": 2.4,
+            "brand": "极光",
+            "evidence": {
+              "id": "c10",
+              "relevance": 0.3593641519546509,
+              "affinity": 0.9672845783497905,
+              "confidence": null,
+              "lexical": 0.5648996985871717,
+              "source": "local-logits"
+            },
+            "rankScore": 0.5541702305661165,
+            "reason": "呼应当前场景 · 轻便 / 耐用"
+          },
+          {
+            "id": "c05",
+            "name": "云顶 · 六角天幕",
+            "subtitle": "涂银防晒 / 公园野餐",
+            "price": 399,
+            "category": "庇护",
+            "mission": "camp",
+            "art": "tent",
+            "color": "#e0cead",
+            "tags": [
+              "防晒",
+              "自然",
+              "野餐"
+            ],
+            "quality": 0.85,
+            "bid": 1.5,
+            "brand": "云顶",
+            "evidence": {
+              "id": "c05",
+              "relevance": 0.3140505254268646,
+              "affinity": 0.9653557856472617,
+              "confidence": null,
+              "lexical": 1,
+              "source": "local-logits"
+            },
+            "rankScore": 0.5109326301326655,
+            "reason": "呼应当前场景 · 防晒 / 自然"
+          },
+          {
+            "id": "u01",
+            "name": "行迹 · 通勤双肩包",
+            "subtitle": "18L / 防泼水面料",
+            "price": 399,
+            "category": "携带",
+            "mission": "commute",
+            "art": "bag",
+            "color": "#8c9d83",
+            "tags": [
+              "轻便",
+              "耐用",
+              "自然"
+            ],
+            "quality": 0.92,
+            "bid": 1.8,
+            "brand": "行迹",
+            "evidence": {
+              "id": "u01",
+              "relevance": 0.2450849860906601,
+              "affinity": 0.9557876832986949,
+              "confidence": null,
+              "lexical": 0.2102885389938946,
+              "source": "local-logits"
+            },
+            "rankScore": 0.46893108086736174,
+            "reason": "跨场景发现 · 轻便 / 耐用"
+          },
+          {
+            "id": "d03",
+            "name": "序 · 模块收纳盘",
+            "subtitle": "再生材质 / 自由组合",
+            "price": 89,
+            "category": "收纳",
+            "mission": "desk",
+            "art": "tray",
+            "color": "#b9957d",
+            "tags": [
+              "自然",
+              "简约",
+              "收纳"
+            ],
+            "quality": 0.85,
+            "bid": 0,
+            "brand": "序",
+            "evidence": {
+              "id": "d03",
+              "relevance": 0.22270013391971588,
+              "affinity": 0.9618693133816123,
+              "confidence": null,
+              "lexical": 0.10574916727152672,
+              "source": "local-logits"
+            },
+            "rankScore": 0.4480473400093615,
+            "reason": "跨场景发现 · 自然 / 简约"
+          },
+          {
+            "id": "c04",
+            "name": "远山 · 真空随行杯",
+            "subtitle": "600ml / 轻量保温",
+            "price": 129,
+            "category": "饮水",
+            "mission": "camp",
+            "art": "bottle",
+            "color": "#8c9f83",
+            "tags": [
+              "轻便",
+              "自然",
+              "保温"
+            ],
+            "quality": 0.87,
+            "bid": 0.8,
+            "brand": "远山",
+            "evidence": {
+              "id": "c04",
+              "relevance": 0.23370634019374847,
+              "affinity": 0.912246807522024,
+              "confidence": null,
+              "lexical": 0.7041193268165264,
+              "source": "local-logits"
+            },
+            "rankScore": 0.4466146089865943,
+            "reason": "呼应当前场景 · 轻便 / 自然"
+          },
+          {
+            "id": "f12",
+            "name": "晨光 · 马克杯",
+            "subtitle": "宽口杯型 / 温润陶瓷",
+            "price": 139,
+            "category": "饮用",
+            "mission": "coffee",
+            "art": "cup",
+            "color": "#dfb695",
+            "tags": [
+              "自然",
+              "舒适",
+              "复古"
+            ],
+            "quality": 0.94,
+            "bid": 0.8,
+            "brand": "晨光",
+            "evidence": {
+              "id": "f12",
+              "relevance": 0.20434190332889557,
+              "affinity": 0.9618838053575018,
+              "confidence": null,
+              "lexical": 0.1110268521445974,
+              "source": "local-logits"
+            },
+            "rankScore": 0.4445669314422994,
+            "reason": "跨场景发现 · 自然 / 舒适"
+          },
+          {
+            "id": "c06",
+            "name": "岩石 · 战术折叠椅",
+            "subtitle": "加厚骨架 / 稳定承重",
+            "price": 289,
+            "category": "座椅",
+            "mission": "camp",
+            "art": "chair",
+            "color": "#596b60",
+            "tags": [
+              "耐用",
+              "深色",
+              "稳定"
+            ],
+            "quality": 0.94,
+            "bid": 2.1,
+            "brand": "岩石",
+            "evidence": {
+              "id": "c06",
+              "relevance": 0.19436779618263245,
+              "affinity": 0.9544634582562139,
+              "confidence": null,
+              "lexical": 0.47035643699303475,
+              "source": "local-logits"
+            },
+            "rankScore": 0.43615206222055714,
+            "reason": "呼应当前场景 · 耐用 / 深色"
+          },
+          {
+            "id": "d12",
+            "name": "晴窗 · 桌面音箱",
+            "subtitle": "立体声 / 蓝牙连接",
+            "price": 329,
+            "category": "聆听",
+            "mission": "desk",
+            "art": "speaker",
+            "color": "#c59b77",
+            "tags": [
+              "自然",
+              "复古",
+              "舒适"
+            ],
+            "quality": 0.87,
+            "bid": 1.1,
+            "brand": "晴窗",
+            "evidence": {
+              "id": "d12",
+              "relevance": 0.1755380481481552,
+              "affinity": 0.95703578251414,
+              "confidence": null,
+              "lexical": 0.1110268521445974,
+              "source": "local-logits"
+            },
+            "rankScore": 0.41691374489385635,
+            "reason": "跨场景发现 · 自然 / 复古"
+          },
+          {
+            "id": "d06",
+            "name": "纸月 · 球形氛围灯",
+            "subtitle": "纸感灯罩 / 柔和暖光",
+            "price": 199,
+            "category": "照明",
+            "mission": "desk",
+            "art": "lamp",
+            "color": "#e9dac1",
+            "tags": [
+              "自然",
+              "暖光",
+              "复古"
+            ],
+            "quality": 0.84,
+            "bid": 1.7,
+            "brand": "纸月",
+            "evidence": {
+              "id": "d06",
+              "relevance": 0.18242551386356354,
+              "affinity": 0.9430856461403891,
+              "confidence": null,
+              "lexical": 0.10574916727152672,
+              "source": "local-logits"
+            },
+            "rankScore": 0.41552819157810883,
+            "reason": "跨场景发现 · 自然 / 暖光"
+          },
+          {
+            "id": "u05",
+            "name": "漫步 · 帆布托特包",
+            "subtitle": "加宽肩带 / 电脑夹层",
+            "price": 169,
+            "category": "携带",
+            "mission": "commute",
+            "art": "bag",
+            "color": "#c3ac88",
+            "tags": [
+              "自然",
+              "轻便",
+              "实惠"
+            ],
+            "quality": 0.82,
+            "bid": 1.3,
+            "brand": "漫步",
+            "evidence": {
+              "id": "u05",
+              "relevance": 0.16238002479076385,
+              "affinity": 0.9430215767933987,
+              "confidence": null,
+              "lexical": 0.2051687999922398,
+              "source": "local-logits"
+            },
+            "rankScore": 0.3998831637522672,
+            "reason": "跨场景发现 · 自然 / 轻便"
+          },
+          {
+            "id": "f02",
+            "name": "细流 · 手冲壶",
+            "subtitle": "600ml / 精细控流",
+            "price": 219,
+            "category": "冲煮",
+            "mission": "coffee",
+            "art": "kettle",
+            "color": "#c8b394",
+            "tags": [
+              "自然",
+              "简约",
+              "入门"
+            ],
+            "quality": 0.9,
+            "bid": 0.9,
+            "brand": "细流",
+            "evidence": {
+              "id": "f02",
+              "relevance": 0.1441488415002823,
+              "affinity": 0.9563850640552118,
+              "confidence": null,
+              "lexical": 0.11685900196542254,
+              "source": "local-logits"
+            },
+            "rankScore": 0.3984259263123386,
+            "reason": "跨场景发现 · 自然 / 简约"
+          },
+          {
+            "id": "d10",
+            "name": "小丘 · 护腕垫",
+            "subtitle": "慢回弹 / 棉麻外套",
+            "price": 59,
+            "category": "支撑",
+            "mission": "desk",
+            "art": "mat",
+            "color": "#bdbda0",
+            "tags": [
+              "舒适",
+              "自然",
+              "实惠"
+            ],
+            "quality": 0.78,
+            "bid": 0,
+            "brand": "小丘",
+            "evidence": {
+              "id": "d10",
+              "relevance": 0.14608722925186157,
+              "affinity": 0.9494100425508805,
+              "confidence": null,
+              "lexical": 0.11386829764971979,
+              "source": "local-logits"
+            },
+            "rankScore": 0.3862095252524596,
+            "reason": "跨场景发现 · 舒适 / 自然"
+          },
+          {
+            "id": "f03",
+            "name": "云杯 · 手作陶杯",
+            "subtitle": "哑光釉面 / 300ml",
+            "price": 89,
+            "category": "饮用",
+            "mission": "coffee",
+            "art": "cup",
+            "color": "#c3c6a9",
+            "tags": [
+              "自然",
+              "舒适",
+              "复古"
+            ],
+            "quality": 0.86,
+            "bid": 0.5,
+            "brand": "云杯",
+            "evidence": {
+              "id": "f03",
+              "relevance": 0.12592275440692902,
+              "affinity": 0.9311945814988576,
+              "confidence": null,
+              "lexical": 0.11386829764971979,
+              "source": "local-logits"
+            },
+            "rankScore": 0.3764902809264604,
+            "reason": "跨场景发现 · 自然 / 舒适"
+          },
+          {
+            "id": "f01",
+            "name": "研物 · 手摇磨豆机",
+            "subtitle": "不锈钢磨芯 / 分档研磨",
+            "price": 299,
+            "category": "研磨",
+            "mission": "coffee",
+            "art": "grinder",
+            "color": "#a4866c",
+            "tags": [
+              "自然",
+              "复古",
+              "入门"
+            ],
+            "quality": 0.91,
+            "bid": 1.2,
+            "brand": "研物",
+            "evidence": {
+              "id": "f01",
+              "relevance": 0.1208532303571701,
+              "affinity": 0.9170134143496398,
+              "confidence": null,
+              "lexical": 0.10329411351715768,
+              "source": "local-logits"
+            },
+            "rankScore": 0.37492314779979646,
+            "reason": "跨场景发现 · 自然 / 复古"
+          },
+          {
+            "id": "f11",
+            "name": "木纹 · 胡桃木托盘",
+            "subtitle": "圆角实木 / 咖啡角收纳",
+            "price": 119,
+            "category": "收纳",
+            "mission": "coffee",
+            "art": "tray",
+            "color": "#b38761",
+            "tags": [
+              "自然",
+              "复古",
+              "收纳"
+            ],
+            "quality": 0.85,
+            "bid": 0.5,
+            "brand": "木纹",
+            "evidence": {
+              "id": "f11",
+              "relevance": 0.1225232183933258,
+              "affinity": 0.9291981098358519,
+              "confidence": null,
+              "lexical": 0.10329411351715768,
+              "source": "local-logits"
+            },
+            "rankScore": 0.372739372671349,
+            "reason": "跨场景发现 · 自然 / 复古"
+          },
+          {
+            "id": "d08",
+            "name": "木序 · 显示器增高架",
+            "subtitle": "实木 / 底部可收纳",
+            "price": 259,
+            "category": "支撑",
+            "mission": "desk",
+            "art": "stand",
+            "color": "#bd926a",
+            "tags": [
+              "自然",
+              "舒适",
+              "复古"
+            ],
+            "quality": 0.93,
+            "bid": 1.2,
+            "brand": "木序",
+            "evidence": {
+              "id": "d08",
+              "relevance": 0.08509903401136398,
+              "affinity": 0.9158593670581467,
+              "confidence": null,
+              "lexical": 0.10574916727152672,
+              "source": "local-logits"
+            },
+            "rankScore": 0.35235640388051986,
+            "reason": "跨场景发现 · 自然 / 舒适"
+          }
+        ],
+        "slate": [
+          {
+            "id": "c03",
+            "name": "萤火 · 复古营地灯",
+            "subtitle": "暖光三档 / USB-C 充电",
+            "price": 159,
+            "category": "照明",
+            "mission": "camp",
+            "art": "lantern",
+            "color": "#d4a568",
+            "tags": [
+              "暖光",
+              "复古",
+              "自然"
+            ],
+            "quality": 0.88,
+            "bid": 0,
+            "brand": "萤火",
+            "evidence": {
+              "id": "c03",
+              "relevance": 0.49218809604644775,
+              "affinity": 0.9758519190800143,
+              "confidence": null,
+              "lexical": 0.5761056042645615,
+              "source": "local-logits"
+            },
+            "rankScore": 0.6373753275091876,
+            "reason": "呼应当前场景 · 暖光 / 复古"
+          },
+          {
+            "id": "c08",
+            "name": "溪流 · 便携水壶",
+            "subtitle": "1L / 大口径易清洗",
+            "price": 79,
+            "category": "饮水",
+            "mission": "camp",
+            "art": "bottle",
+            "color": "#dfc5a3",
+            "tags": [
+              "轻便",
+              "实惠",
+              "耐用"
+            ],
+            "quality": 0.8,
+            "bid": 0,
+            "brand": "溪流",
+            "evidence": {
+              "id": "c08",
+              "relevance": 0.47268348932266235,
+              "affinity": 0.9705272133433027,
+              "confidence": null,
+              "lexical": 0.5786528923309533,
+              "source": "local-logits"
+            },
+            "rankScore": 0.614940759674937,
+            "reason": "呼应当前场景 · 轻便 / 实惠"
+          },
+          {
+            "id": "c01",
+            "name": "栖野 · 双人轻帐",
+            "subtitle": "轻量铝杆 / 双层透气",
+            "price": 569,
+            "category": "庇护",
+            "mission": "camp",
+            "art": "tent",
+            "color": "#b8c597",
+            "tags": [
+              "轻便",
+              "自然",
+              "防风"
+            ],
+            "quality": 0.91,
+            "bid": 1.8,
+            "brand": "栖野",
+            "evidence": {
+              "id": "c01",
+              "relevance": 0.45713669061660767,
+              "affinity": 0.9597058293147711,
+              "confidence": null,
+              "lexical": 0.6869766561005245,
+              "source": "local-logits"
+            },
+            "rankScore": 0.6129882320685428,
+            "reason": "呼应当前场景 · 轻便 / 自然"
+          },
+          {
+            "id": "c02",
+            "name": "林间 · 折叠月亮椅",
+            "subtitle": "榉木扶手 / 一折即走",
+            "price": 219,
+            "category": "座椅",
+            "mission": "camp",
+            "art": "chair",
+            "color": "#d9ba83",
+            "tags": [
+              "舒适",
+              "自然",
+              "便携"
+            ],
+            "quality": 0.9,
+            "bid": 1.2,
+            "brand": "林间",
+            "evidence": {
+              "id": "c02",
+              "relevance": 0.4148988127708435,
+              "affinity": 0.9743314533989178,
+              "confidence": null,
+              "lexical": 0.5761056042645615,
+              "source": "local-logits"
+            },
+            "rankScore": 0.5864841124319354,
+            "reason": "呼应当前场景 · 舒适 / 自然"
+          }
+        ],
+        "greedy": [
+          {
+            "id": "c03",
+            "name": "萤火 · 复古营地灯",
+            "subtitle": "暖光三档 / USB-C 充电",
+            "price": 159,
+            "category": "照明",
+            "mission": "camp",
+            "art": "lantern",
+            "color": "#d4a568",
+            "tags": [
+              "暖光",
+              "复古",
+              "自然"
+            ],
+            "quality": 0.88,
+            "bid": 0,
+            "brand": "萤火",
+            "evidence": {
+              "id": "c03",
+              "relevance": 0.49218809604644775,
+              "affinity": 0.9758519190800143,
+              "confidence": null,
+              "lexical": 0.5761056042645615,
+              "source": "local-logits"
+            },
+            "rankScore": 0.6373753275091876,
+            "reason": "呼应当前场景 · 暖光 / 复古"
+          },
+          {
+            "id": "c09",
+            "name": "晴日 · 野餐垫",
+            "subtitle": "防潮底层 / 可机洗",
+            "price": 139,
+            "category": "收纳",
+            "mission": "camp",
+            "art": "mat",
+            "color": "#c89474",
+            "tags": [
+              "自然",
+              "野餐",
+              "舒适"
+            ],
+            "quality": 0.82,
+            "bid": 1,
+            "brand": "晴日",
+            "evidence": {
+              "id": "c09",
+              "relevance": 0.4843800663948059,
+              "affinity": 0.9845576899442676,
+              "confidence": null,
+              "lexical": 0.6203374089521725,
+              "source": "local-logits"
+            },
+            "rankScore": 0.6279811369362068,
+            "reason": "呼应当前场景 · 自然 / 野餐"
+          },
+          {
+            "id": "c12",
+            "name": "暖夜 · 双光营灯",
+            "subtitle": "防水外壳 / 长时续航",
+            "price": 239,
+            "category": "照明",
+            "mission": "camp",
+            "art": "lantern",
+            "color": "#7c8d70",
+            "tags": [
+              "耐用",
+              "自然",
+              "暖光"
+            ],
+            "quality": 0.96,
+            "bid": 1.1,
+            "brand": "暖夜",
+            "evidence": {
+              "id": "c12",
+              "relevance": 0.46490153670310974,
+              "affinity": 0.9642259212778299,
+              "confidence": null,
+              "lexical": 0.5901316198778558,
+              "source": "local-logits"
+            },
+            "rankScore": 0.6242627476392372,
+            "reason": "呼应当前场景 · 耐用 / 自然"
+          },
+          {
+            "id": "c08",
+            "name": "溪流 · 便携水壶",
+            "subtitle": "1L / 大口径易清洗",
+            "price": 79,
+            "category": "饮水",
+            "mission": "camp",
+            "art": "bottle",
+            "color": "#dfc5a3",
+            "tags": [
+              "轻便",
+              "实惠",
+              "耐用"
+            ],
+            "quality": 0.8,
+            "bid": 0,
+            "brand": "溪流",
+            "evidence": {
+              "id": "c08",
+              "relevance": 0.47268348932266235,
+              "affinity": 0.9705272133433027,
+              "confidence": null,
+              "lexical": 0.5786528923309533,
+              "source": "local-logits"
+            },
+            "rankScore": 0.614940759674937,
+            "reason": "呼应当前场景 · 轻便 / 实惠"
+          }
+        ],
+        "auction": {
+          "winner": null,
+          "cpc": 0,
+          "rows": [
+            {
+              "id": "c10",
+              "bid": 2.4,
+              "pctr": 0.05895,
+              "value": 0.07803398815298081,
+              "eligible": false
+            },
+            {
+              "id": "c06",
+              "bid": 2.1,
+              "pctr": 0.0579,
+              "value": 0.05302022623649239,
+              "eligible": false
+            },
+            {
+              "id": "u01",
+              "bid": 1.8,
+              "pctr": 0.05720000000000001,
+              "value": 0.04855176511752606,
+              "eligible": false
+            },
+            {
+              "id": "c05",
+              "bid": 1.5,
+              "pctr": 0.05475000000000001,
+              "value": 0.042691479580476886,
+              "eligible": false
+            },
+            {
+              "id": "c12",
+              "bid": 1.1,
+              "pctr": 0.058600000000000006,
+              "value": 0.04031528713911772,
+              "eligible": false
+            },
+            {
+              "id": "d06",
+              "bid": 1.7,
+              "pctr": 0.054400000000000004,
+              "value": 0.039553498065471655,
+              "eligible": false
+            },
+            {
+              "id": "c09",
+              "bid": 1,
+              "pctr": 0.0537,
+              "value": 0.03431784669578075,
+              "eligible": false
+            },
+            {
+              "id": "u05",
+              "bid": 1.3,
+              "pctr": 0.0537,
+              "value": 0.028878024671450255,
+              "eligible": false
+            },
+            {
+              "id": "f01",
+              "bid": 1.2,
+              "pctr": 0.056850000000000005,
+              "value": 0.026237225162476303,
+              "eligible": false
+            },
+            {
+              "id": "d12",
+              "bid": 1.1,
+              "pctr": 0.05545,
+              "value": 0.02579336027275771,
+              "eligible": false
+            },
+            {
+              "id": "d08",
+              "bid": 1.2,
+              "pctr": 0.057550000000000004,
+              "value": 0.024831857502177354,
+              "eligible": false
+            },
+            {
+              "id": "c04",
+              "bid": 0.8,
+              "pctr": 0.05545,
+              "value": 0.020565049275696277,
+              "eligible": false
+            },
+            {
+              "id": "f12",
+              "bid": 0.8,
+              "pctr": 0.0579,
+              "value": 0.02052158187353611,
+              "eligible": false
+            },
+            {
+              "id": "f02",
+              "bid": 0.9,
+              "pctr": 0.05650000000000001,
+              "value": 0.020385978013202553,
+              "eligible": false
+            },
+            {
+              "id": "c07",
+              "bid": 0.5,
+              "pctr": 0.05265,
+              "value": 0.0159654931730032,
+              "eligible": false
+            },
+            {
+              "id": "f03",
+              "bid": 0.5,
+              "pctr": 0.0551,
+              "value": 0.010693420318737625,
+              "eligible": false
+            },
+            {
+              "id": "f11",
+              "bid": 0.5,
+              "pctr": 0.05475000000000001,
+              "value": 0.010560351172462108,
+              "eligible": false
+            }
+          ],
+          "note": "独立赞助位 · 模拟质量加权二价竞价；pCTR 来自固定演示公式，非 Jev 概率。不产生扣费。"
+        },
+        "total": 1026,
+        "coverage": 1,
+        "objective": 4.531788431684603,
+        "warnings": [
+          "候选 logits 的条件 softmax，未经业务校准。"
+        ],
+        "model": "openbmb/MiniCPM5-2B@12a3808a956f",
+        "modelCalls": 1,
+        "modelLatency": 38184.13604099999,
+        "usage": {
+          "input_tokens": 65784,
+          "output_tokens": 0
+        },
+        "rawAnswers": {
+          "readout": "direct-candidate-logits",
+          "scores": {
+            "model": "openbmb/MiniCPM5-2B@12a3808a956f",
+            "revision": "12a3808a956f869c767195e9266b59c4d21d92e2",
+            "items": [
+              {
+                "id": "c05",
+                "relevance": 0.3140505254268646,
+                "affinity": 0.9653557856472617
+              },
+              {
+                "id": "c04",
+                "relevance": 0.23370634019374847,
+                "affinity": 0.912246807522024
+              },
+              {
+                "id": "c01",
+                "relevance": 0.45713669061660767,
+                "affinity": 0.9597058293147711
+              },
+              {
+                "id": "c09",
+                "relevance": 0.4843800663948059,
+                "affinity": 0.9845576899442676
+              },
+              {
+                "id": "c07",
+                "relevance": 0.4378235340118408,
+                "affinity": 0.9732143593300862
+              },
+              {
+                "id": "c12",
+                "relevance": 0.46490153670310974,
+                "affinity": 0.9642259212778299
+              },
+              {
+                "id": "c08",
+                "relevance": 0.47268348932266235,
+                "affinity": 0.9705272133433027
+              },
+              {
+                "id": "c11",
+                "relevance": 0.39981159567832947,
+                "affinity": 0.9776218010883895
+              },
+              {
+                "id": "c02",
+                "relevance": 0.4148988127708435,
+                "affinity": 0.9743314533989178
+              },
+              {
+                "id": "c03",
+                "relevance": 0.49218809604644775,
+                "affinity": 0.9758519190800143
+              },
+              {
+                "id": "c10",
+                "relevance": 0.3593641519546509,
+                "affinity": 0.9672845783497905
+              },
+              {
+                "id": "c06",
+                "relevance": 0.19436779618263245,
+                "affinity": 0.9544634582562139
+              },
+              {
+                "id": "u01",
+                "relevance": 0.2450849860906601,
+                "affinity": 0.9557876832986949
+              },
+              {
+                "id": "u05",
+                "relevance": 0.16238002479076385,
+                "affinity": 0.9430215767933987
+              },
+              {
+                "id": "f02",
+                "relevance": 0.1441488415002823,
+                "affinity": 0.9563850640552118
+              },
+              {
+                "id": "d10",
+                "relevance": 0.14608722925186157,
+                "affinity": 0.9494100425508805
+              },
+              {
+                "id": "f03",
+                "relevance": 0.12592275440692902,
+                "affinity": 0.9311945814988576
+              },
+              {
+                "id": "d12",
+                "relevance": 0.1755380481481552,
+                "affinity": 0.95703578251414
+              },
+              {
+                "id": "f12",
+                "relevance": 0.20434190332889557,
+                "affinity": 0.9618838053575018
+              },
+              {
+                "id": "d03",
+                "relevance": 0.22270013391971588,
+                "affinity": 0.9618693133816123
+              },
+              {
+                "id": "d06",
+                "relevance": 0.18242551386356354,
+                "affinity": 0.9430856461403891
+              },
+              {
+                "id": "d08",
+                "relevance": 0.08509903401136398,
+                "affinity": 0.9158593670581467
+              },
+              {
+                "id": "f01",
+                "relevance": 0.1208532303571701,
+                "affinity": 0.9170134143496398
+              },
+              {
+                "id": "f11",
+                "relevance": 0.1225232183933258,
+                "affinity": 0.9291981098358519
+              }
+            ],
+            "distributions": [
+              {
+                "id": "c05",
+                "field": "relevance",
+                "probabilities": [
+                  0.6859495043754578,
+                  0.3140505254268646
+                ],
+                "prompt_sha256": "7a616189d7d4f42600dc0b27e1ffae4aa1e0d68bd426265c07f6d7dce38b3351"
+              },
+              {
+                "id": "c05",
+                "field": "affinity",
+                "probabilities": [
+                  0.03461694344878197,
+                  0.00005454214260680601,
+                  0.9653285145759583
+                ],
+                "prompt_sha256": "f992c3b388be159baff312b5b50b308643a982164ac87e36e44004c26e2cfb71"
+              },
+              {
+                "id": "c04",
+                "field": "relevance",
+                "probabilities": [
+                  0.7662936449050903,
+                  0.23370634019374847
+                ],
+                "prompt_sha256": "d955bf1c838e3925d234b88fb5328e7b24bae192ed1413b22aca67457ef9fecc"
+              },
+              {
+                "id": "c04",
+                "field": "affinity",
+                "probabilities": [
+                  0.08752362430095673,
+                  0.0004592818149831146,
+                  0.9120171666145325
+                ],
+                "prompt_sha256": "233dfb90981ff7c407b08f98c998123d542f14fa96b666ea9c2526427ec815d1"
+              },
+              {
+                "id": "c01",
+                "field": "relevance",
+                "probabilities": [
+                  0.5428633093833923,
+                  0.45713669061660767
+                ],
+                "prompt_sha256": "265f1b06c77850126ab8d6a24bd5c23d0bfbaea6b97655959cad69d023755f89"
+              },
+              {
+                "id": "c01",
+                "field": "affinity",
+                "probabilities": [
+                  0.04023301973938942,
+                  0.0001221889106091112,
+                  0.9596447348594666
+                ],
+                "prompt_sha256": "42e75ed0c6db0f901a0701c924df694e34fd2fee941d30e1861a9969e2f2fd2a"
+              },
+              {
+                "id": "c09",
+                "field": "relevance",
+                "probabilities": [
+                  0.5156199336051941,
+                  0.4843800663948059
+                ],
+                "prompt_sha256": "b75186c67e06b044b6428df9d1e627c8310a33349b453fa1bf58ca76137e91f7"
+              },
+              {
+                "id": "c09",
+                "field": "affinity",
+                "probabilities": [
+                  0.015423986129462719,
+                  0.00003648145866463892,
+                  0.9845394492149353
+                ],
+                "prompt_sha256": "14cf78aedff0942fdd79d924e9bf3a37dca4a383b47feb4bf84fb8819788db4d"
+              },
+              {
+                "id": "c07",
+                "field": "relevance",
+                "probabilities": [
+                  0.562176525592804,
+                  0.4378235340118408
+                ],
+                "prompt_sha256": "c6bac3bd0388e863701639ece70b682980b096ee659137974809183f7df993bc"
+              },
+              {
+                "id": "c07",
+                "field": "affinity",
+                "probabilities": [
+                  0.02675778791308403,
+                  0.000055852029618108645,
+                  0.9731864333152771
+                ],
+                "prompt_sha256": "77b74ea13477678270873da79e39c92a512afcd5e59e5649d4da99421a1f678e"
+              },
+              {
+                "id": "c12",
+                "field": "relevance",
+                "probabilities": [
+                  0.5350984334945679,
+                  0.46490153670310974
+                ],
+                "prompt_sha256": "ab9a1acb5743c810cadefe12b1f834fa44b1cf1a5933cd0c1d015b5f158a1965"
+              },
+              {
+                "id": "c12",
+                "field": "affinity",
+                "probabilities": [
+                  0.035671208053827286,
+                  0.00020558286632876843,
+                  0.9641231298446655
+                ],
+                "prompt_sha256": "e8a84dfc37f7ae2d1e3d1338912d4eadad4d4d4b84cb5174f8d8379bb295c0f4"
+              },
+              {
+                "id": "c08",
+                "field": "relevance",
+                "probabilities": [
+                  0.5273165702819824,
+                  0.47268348932266235
+                ],
+                "prompt_sha256": "90f83679a85e20621a4708d6ba6fbf654a462aead010c98dcac06042fa332811"
+              },
+              {
+                "id": "c08",
+                "field": "affinity",
+                "probabilities": [
+                  0.02930222824215889,
+                  0.00034114028676413,
+                  0.9703566431999207
+                ],
+                "prompt_sha256": "9f4fbfe665b498a7884a2e40e307a55e521017daeeafae3d8c1636f43030c458"
+              },
+              {
+                "id": "c11",
+                "field": "relevance",
+                "probabilities": [
+                  0.6001883745193481,
+                  0.39981159567832947
+                ],
+                "prompt_sha256": "4dea51861c0c9c5c22669c393dbd72ce3709932766fd0ca653fed7bb507bd66e"
+              },
+              {
+                "id": "c11",
+                "field": "affinity",
+                "probabilities": [
+                  0.022281888872385025,
+                  0.0001927761040860787,
+                  0.9775254130363464
+                ],
+                "prompt_sha256": "395b1836e4a211d4ca0b527e9827e59f17154151b12f2bc537e2d958d3825c54"
+              },
+              {
+                "id": "c02",
+                "field": "relevance",
+                "probabilities": [
+                  0.5851011276245117,
+                  0.4148988127708435
+                ],
+                "prompt_sha256": "6e481123f14d1d29352f29f4f50e4f0f04fc4617e8161f4159db4141cdc8e415"
+              },
+              {
+                "id": "c02",
+                "field": "affinity",
+                "probabilities": [
+                  0.025559645146131516,
+                  0.0002177058777306229,
+                  0.9742226004600525
+                ],
+                "prompt_sha256": "a181c61dad2482076a7947999cb2c2c29cdf14f01024ed6d558a13cf679a9392"
+              },
+              {
+                "id": "c03",
+                "field": "relevance",
+                "probabilities": [
+                  0.5078118443489075,
+                  0.49218809604644775
+                ],
+                "prompt_sha256": "9c179c4cb7373050faf57cea12739ee85b0026121781085a984be2cb3a627724"
+              },
+              {
+                "id": "c03",
+                "field": "affinity",
+                "probabilities": [
+                  0.02404877543449402,
+                  0.000198534777155146,
+                  0.9757526516914368
+                ],
+                "prompt_sha256": "7520afd09b163a6d0086533dad9e5ac477ff550708bce21de1c7467ff8cb5dca"
+              },
+              {
+                "id": "c10",
+                "field": "relevance",
+                "probabilities": [
+                  0.6406359076499939,
+                  0.3593641519546509
+                ],
+                "prompt_sha256": "8f58d728dafad5d92daf876749b8a4d81005264af62c6383ece2ab292310f2ef"
+              },
+              {
+                "id": "c10",
+                "field": "affinity",
+                "probabilities": [
+                  0.03258097916841507,
+                  0.00026897244970314205,
+                  0.967150092124939
+                ],
+                "prompt_sha256": "c43738bbf7208d73f10e120d7980fb0e62e78aaf280a50fea556902ec45b26a3"
+              },
+              {
+                "id": "c06",
+                "field": "relevance",
+                "probabilities": [
+                  0.8056321740150452,
+                  0.19436779618263245
+                ],
+                "prompt_sha256": "c56256f14f6caed321c9c7b1a6af8f6e61b9a0b3f9f2ed696e6e5738912e81c4"
+              },
+              {
+                "id": "c06",
+                "field": "affinity",
+                "probabilities": [
+                  0.04533422365784645,
+                  0.00040466824430041015,
+                  0.9542611241340637
+                ],
+                "prompt_sha256": "423ab5ba8a8b1249f1964fc60b93662aefeff9b788d626d8206b449c782d0fb4"
+              },
+              {
+                "id": "u01",
+                "field": "relevance",
+                "probabilities": [
+                  0.7549149990081787,
+                  0.2450849860906601
+                ],
+                "prompt_sha256": "d43d871b89353443437c059adfd18257f361caa6eaa3409dd9c348b4e2ac6c48"
+              },
+              {
+                "id": "u01",
+                "field": "affinity",
+                "probabilities": [
+                  0.04399995133280754,
+                  0.00042467270395718515,
+                  0.9555753469467163
+                ],
+                "prompt_sha256": "b0ecade2fdc9ad407ed22b03a49e55d2b635a56a61cc1721b2ef39bd3c864c3e"
+              },
+              {
+                "id": "u05",
+                "field": "relevance",
+                "probabilities": [
+                  0.837619960308075,
+                  0.16238002479076385
+                ],
+                "prompt_sha256": "c634ff8bc3328f6d960fba816d370c0d8a070d8c27dd3188a0138d75b07014e9"
+              },
+              {
+                "id": "u05",
+                "field": "affinity",
+                "probabilities": [
+                  0.05661076679825783,
+                  0.0007352455286309123,
+                  0.9426539540290833
+                ],
+                "prompt_sha256": "e4d18a5d46674cc9b4deb1d81118a6769098117548b7beecf9c2de05f9acc1cb"
+              },
+              {
+                "id": "f02",
+                "field": "relevance",
+                "probabilities": [
+                  0.8558511734008789,
+                  0.1441488415002823
+                ],
+                "prompt_sha256": "45e58577526323951b2781ab334df4b15079e40ea154b8be2ea3f6215242e947"
+              },
+              {
+                "id": "f02",
+                "field": "affinity",
+                "probabilities": [
+                  0.04334213584661484,
+                  0.0005455969367176294,
+                  0.956112265586853
+                ],
+                "prompt_sha256": "807058f34012eb0dfe4563dc9236f57899b9b95f54d810e5fc30a8974e9245bf"
+              },
+              {
+                "id": "d10",
+                "field": "relevance",
+                "probabilities": [
+                  0.8539127111434937,
+                  0.14608722925186157
+                ],
+                "prompt_sha256": "2f8897f5c5a44479fae2d33b05385bd31b5302c3b1a55908827a7d0a09ddaff8"
+              },
+              {
+                "id": "d10",
+                "field": "affinity",
+                "probabilities": [
+                  0.05030160769820213,
+                  0.000576538615860045,
+                  0.9491217732429504
+                ],
+                "prompt_sha256": "36200d78679a290489da9f04c27fc85f56ef1a6b4128a5039ca58bc545e957fc"
+              },
+              {
+                "id": "f03",
+                "field": "relevance",
+                "probabilities": [
+                  0.8740772008895874,
+                  0.12592275440692902
+                ],
+                "prompt_sha256": "cc110564b9d1740dcb1b65e47daf35d84ecbea44ecb3a19f22ed31607463142e"
+              },
+              {
+                "id": "f03",
+                "field": "affinity",
+                "probabilities": [
+                  0.06849492341279984,
+                  0.0006210365099832416,
+                  0.930884063243866
+                ],
+                "prompt_sha256": "35018bd4eae02905852f1bac6db09f7db1f712900795ea2151d8d16a377185d4"
+              },
+              {
+                "id": "d12",
+                "field": "relevance",
+                "probabilities": [
+                  0.8244618773460388,
+                  0.1755380481481552
+                ],
+                "prompt_sha256": "9d57033753f0295732a2a81942c2ee126786d09939a21de4af3fe349509d9143"
+              },
+              {
+                "id": "d12",
+                "field": "affinity",
+                "probabilities": [
+                  0.04269958660006523,
+                  0.0005291751585900784,
+                  0.956771194934845
+                ],
+                "prompt_sha256": "86c8073a9d21f6b1f7af5073a3407c506032052f642ba0f9b3e831a16739d246"
+              },
+              {
+                "id": "f12",
+                "field": "relevance",
+                "probabilities": [
+                  0.7956581711769104,
+                  0.20434190332889557
+                ],
+                "prompt_sha256": "da54acebd1e7bebd8b91fb2882d52e5f64d90a3847386b285d87dbf3c9376cca"
+              },
+              {
+                "id": "f12",
+                "field": "affinity",
+                "probabilities": [
+                  0.03787407651543617,
+                  0.0004842721682507545,
+                  0.9616416692733765
+                ],
+                "prompt_sha256": "72ae0d46d394394d555bcb05f863e6ca6f36f49c60c1c6e74d8a3a5ca235853e"
+              },
+              {
+                "id": "d03",
+                "field": "relevance",
+                "probabilities": [
+                  0.7772998809814453,
+                  0.22270013391971588
+                ],
+                "prompt_sha256": "9027bea295686f1845ec7665c38468b0afe2c84fcb8d94bc4066b3ec31a10bc8"
+              },
+              {
+                "id": "d03",
+                "field": "affinity",
+                "probabilities": [
+                  0.03787289187312126,
+                  0.0005154889076948166,
+                  0.9616115689277649
+                ],
+                "prompt_sha256": "975d3325ae3b17998747d4107a4b9041f21be18f25425a101ea90a2ebefba6f0"
+              },
+              {
+                "id": "d06",
+                "field": "relevance",
+                "probabilities": [
+                  0.8175745010375977,
+                  0.18242551386356354
+                ],
+                "prompt_sha256": "58f49ffc5bc33f4070dd20ab9d46cc27777c8c6ed1c57174699a39661c5dddc5"
+              },
+              {
+                "id": "d06",
+                "field": "affinity",
+                "probabilities": [
+                  0.05661894753575325,
+                  0.000590871786698699,
+                  0.9427902102470398
+                ],
+                "prompt_sha256": "9c3bd7d08753f8695aeee0c7bccaefe52f7aaaf20f4e280aa9be824402708d60"
+              },
+              {
+                "id": "d08",
+                "field": "relevance",
+                "probabilities": [
+                  0.9149009585380554,
+                  0.08509903401136398
+                ],
+                "prompt_sha256": "7b1f7760746dd7eee38de30e16fa5346e7963a65ef81ff11270e1d1322a5d2e6"
+              },
+              {
+                "id": "d08",
+                "field": "affinity",
+                "probabilities": [
+                  0.08383993059396744,
+                  0.000601342529989779,
+                  0.9155586957931519
+                ],
+                "prompt_sha256": "eb33bd0a0710bb1c44b6b597e826605898d091f54df13134f6ba2fa7a8d8864c"
+              },
+              {
+                "id": "f01",
+                "field": "relevance",
+                "probabilities": [
+                  0.8791468143463135,
+                  0.1208532303571701
+                ],
+                "prompt_sha256": "c60bc872308a509e9393b3f8e78b1cfbd9dd688604b4a48bc08c32c160f01ba1"
+              },
+              {
+                "id": "f01",
+                "field": "affinity",
+                "probabilities": [
+                  0.08264002203941345,
+                  0.0006929787923581898,
+                  0.9166669249534607
+                ],
+                "prompt_sha256": "ac836420162976cecca9d31ec191672bfe933e3f9aa9478f9f20516f2be93de8"
+              },
+              {
+                "id": "f11",
+                "field": "relevance",
+                "probabilities": [
+                  0.8774768114089966,
+                  0.1225232183933258
+                ],
+                "prompt_sha256": "2ceaca4094451ed9be6b1a9ed8d66edb7d35e3462dee820e1135eb768b7a46b3"
+              },
+              {
+                "id": "f11",
+                "field": "affinity",
+                "probabilities": [
+                  0.07051977515220642,
+                  0.0005642647156491876,
+                  0.9289159774780273
+                ],
+                "prompt_sha256": "e42ade921c242bcaa9264e004d25d1fe2bf45d5efb8642f8b04fa19d65e81471"
+              }
+            ],
+            "readout": "conditional candidate-token softmax; uncalibrated",
+            "usage": {
+              "input_tokens": 65784,
+              "output_tokens": 0
+            },
+            "timing": {
+              "mode": "shared",
+              "device": "mps",
+              "dtype": "torch.float16",
+              "load_seconds": 18.974991791998036,
+              "score_seconds": 16.061604124988662,
+              "forward_seconds": 15.779442041995935,
+              "forward_calls": 13,
+              "prefix_tokens": 1334,
+              "batch_size": 4,
+              "generated_tokens": 0
+            }
+          },
+          "timing": {
+            "mode": "shared",
+            "device": "mps",
+            "dtype": "torch.float16",
+            "load_seconds": 18.974991791998036,
+            "score_seconds": 16.061604124988662,
+            "forward_seconds": 15.779442041995935,
+            "forward_calls": 13,
+            "prefix_tokens": 1334,
+            "batch_size": 4,
+            "generated_tokens": 0
+          }
+        },
+        "totalLatency": 38199.84120799998,
+        "version": "recjev-v0.1-catalog1-rubric1",
+        "trace": [
+          {
+            "name": "召回候选",
+            "detail": "BM25 + 场景召回 · 48 → 24 件",
+            "ms": 2.6722499999887077
+          },
+          {
+            "name": "候选评分",
+            "detail": "48 项评分 · 1 次请求",
+            "ms": 38184.13604099999
+          },
+          {
+            "name": "生成组合",
+            "detail": "Beam search · 宽度 40 · 预算硬约束 · 最多 4 件",
+            "ms": 11.244084000005387
+          },
+          {
+            "name": "赞助竞价",
+            "detail": "无展示 · 关闭或无合格候选",
+            "ms": 0
+          }
+        ]
+      },
+      "error": null,
+      "elapsed": 38199.992042
+    }
+  ]
+}

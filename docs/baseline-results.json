@@ -1,0 +1,393 @@
+{
+  "seed": 42,
+  "cases": 12,
+  "provider": "baseline",
+  "modelCalls": 0,
+  "models": [
+    "local-heuristic-v1"
+  ],
+  "metrics": [
+    {
+      "policy": "逐件排序",
+      "coverage": 0.5416666666666666,
+      "budgetPass": 1,
+      "meanUtility": 0.6180555555555556,
+      "ndcg": 0.64068015539659,
+      "latency": 4.344322916666669,
+      "ci": [
+        0.5347222222222222,
+        0.6875
+      ]
+    },
+    {
+      "policy": "组合生成",
+      "coverage": 1,
+      "budgetPass": 1,
+      "meanUtility": 0.8888888888888887,
+      "ndcg": 0.6720418890424318,
+      "latency": 4.344322916666669,
+      "ci": [
+        0.857638888888889,
+        0.9201388888888888
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "caseId": "camp-675",
+      "policy": "逐件排序",
+      "ids": [
+        "c05",
+        "c04",
+        "c09"
+      ],
+      "coverage": 0.5,
+      "total": 667,
+      "budget": 675,
+      "ndcg": 0.4972609923070811,
+      "utility": 0.5416666666666666
+    },
+    {
+      "caseId": "camp-675",
+      "policy": "组合生成",
+      "ids": [
+        "c05",
+        "c07",
+        "c08",
+        "c11"
+      ],
+      "coverage": 1,
+      "total": 636,
+      "budget": 675,
+      "ndcg": 0.4285714285714286,
+      "utility": 0.8333333333333333
+    },
+    {
+      "caseId": "camp-1050",
+      "policy": "逐件排序",
+      "ids": [
+        "c05",
+        "c01",
+        "c08"
+      ],
+      "coverage": 0.5,
+      "total": 1047,
+      "budget": 1050,
+      "ndcg": 0.4972609923070811,
+      "utility": 0.5416666666666666
+    },
+    {
+      "caseId": "camp-1050",
+      "policy": "组合生成",
+      "ids": [
+        "c05",
+        "c04",
+        "c12",
+        "c02"
+      ],
+      "coverage": 1,
+      "total": 986,
+      "budget": 1050,
+      "ndcg": 0.6653885285781985,
+      "utility": 0.9166666666666666
+    },
+    {
+      "caseId": "camp-1500",
+      "policy": "逐件排序",
+      "ids": [
+        "c05",
+        "c01",
+        "c04",
+        "c12"
+      ],
+      "coverage": 0.75,
+      "total": 1336,
+      "budget": 1500,
+      "ndcg": 0.6808528078495891,
+      "utility": 0.7916666666666666
+    },
+    {
+      "caseId": "camp-1500",
+      "policy": "组合生成",
+      "ids": [
+        "c05",
+        "c04",
+        "c12",
+        "c02"
+      ],
+      "coverage": 1,
+      "total": 986,
+      "budget": 1500,
+      "ndcg": 0.6653885285781985,
+      "utility": 0.9166666666666666
+    },
+    {
+      "caseId": "desk-720",
+      "policy": "逐件排序",
+      "ids": [
+        "d01",
+        "d11",
+        "d05"
+      ],
+      "coverage": 0.25,
+      "total": 717,
+      "budget": 720,
+      "ndcg": 0.5795910844507222,
+      "utility": 0.41666666666666663
+    },
+    {
+      "caseId": "desk-720",
+      "policy": "组合生成",
+      "ids": [
+        "d11",
+        "d04",
+        "d02",
+        "d03"
+      ],
+      "coverage": 1,
+      "total": 696,
+      "budget": 720,
+      "ndcg": 0.6808528078495891,
+      "utility": 0.9166666666666666
+    },
+    {
+      "caseId": "desk-1120",
+      "policy": "逐件排序",
+      "ids": [
+        "d01",
+        "d11",
+        "d05",
+        "d04"
+      ],
+      "coverage": 0.5,
+      "total": 906,
+      "budget": 1120,
+      "ndcg": 0.7477186207218396,
+      "utility": 0.6666666666666666
+    },
+    {
+      "caseId": "desk-1120",
+      "policy": "组合生成",
+      "ids": [
+        "d01",
+        "d04",
+        "d02",
+        "d07"
+      ],
+      "coverage": 1,
+      "total": 1016,
+      "budget": 1120,
+      "ndcg": 0.9039271221307901,
+      "utility": 0.9583333333333333
+    },
+    {
+      "caseId": "desk-1600",
+      "policy": "逐件排序",
+      "ids": [
+        "d01",
+        "d11",
+        "d05",
+        "d04"
+      ],
+      "coverage": 0.5,
+      "total": 906,
+      "budget": 1600,
+      "ndcg": 0.7477186207218396,
+      "utility": 0.6666666666666666
+    },
+    {
+      "caseId": "desk-1600",
+      "policy": "组合生成",
+      "ids": [
+        "d01",
+        "d04",
+        "d02",
+        "d07"
+      ],
+      "coverage": 1,
+      "total": 1016,
+      "budget": 1600,
+      "ndcg": 0.9039271221307901,
+      "utility": 0.9583333333333333
+    },
+    {
+      "caseId": "commute-810",
+      "policy": "逐件排序",
+      "ids": [
+        "u01",
+        "u07",
+        "u12",
+        "u08"
+      ],
+      "coverage": 0.75,
+      "total": 796,
+      "budget": 810,
+      "ndcg": 0.6036093039180246,
+      "utility": 0.7083333333333333
+    },
+    {
+      "caseId": "commute-810",
+      "policy": "组合生成",
+      "ids": [
+        "u07",
+        "u06",
+        "u08",
+        "u05"
+      ],
+      "coverage": 1,
+      "total": 646,
+      "budget": 810,
+      "ndcg": 0.37280285000112834,
+      "utility": 0.7916666666666666
+    },
+    {
+      "caseId": "commute-1260",
+      "policy": "逐件排序",
+      "ids": [
+        "u01",
+        "u07",
+        "u12",
+        "u03"
+      ],
+      "coverage": 0.5,
+      "total": 866,
+      "budget": 1260,
+      "ndcg": 0.7477186207218396,
+      "utility": 0.6666666666666666
+    },
+    {
+      "caseId": "commute-1260",
+      "policy": "组合生成",
+      "ids": [
+        "u01",
+        "u07",
+        "u06",
+        "u08"
+      ],
+      "coverage": 1,
+      "total": 876,
+      "budget": 1260,
+      "ndcg": 0.6036093039180246,
+      "utility": 0.8333333333333333
+    },
+    {
+      "caseId": "commute-1800",
+      "policy": "逐件排序",
+      "ids": [
+        "u01",
+        "u07",
+        "u12",
+        "u03"
+      ],
+      "coverage": 0.5,
+      "total": 866,
+      "budget": 1800,
+      "ndcg": 0.7477186207218396,
+      "utility": 0.6666666666666666
+    },
+    {
+      "caseId": "commute-1800",
+      "policy": "组合生成",
+      "ids": [
+        "u01",
+        "u07",
+        "u06",
+        "u08"
+      ],
+      "coverage": 1,
+      "total": 876,
+      "budget": 1800,
+      "ndcg": 0.6036093039180246,
+      "utility": 0.8333333333333333
+    },
+    {
+      "caseId": "coffee-540",
+      "policy": "逐件排序",
+      "ids": [
+        "f02",
+        "f04",
+        "f05"
+      ],
+      "coverage": 0.75,
+      "total": 487,
+      "budget": 540,
+      "ndcg": 0.720335306588282,
+      "utility": 0.7083333333333333
+    },
+    {
+      "caseId": "coffee-540",
+      "policy": "组合生成",
+      "ids": [
+        "f02",
+        "f05",
+        "f08",
+        "f07"
+      ],
+      "coverage": 1,
+      "total": 496,
+      "budget": 540,
+      "ndcg": 0.6516457428526297,
+      "utility": 0.875
+    },
+    {
+      "caseId": "coffee-840",
+      "policy": "逐件排序",
+      "ids": [
+        "f02",
+        "f10"
+      ],
+      "coverage": 0.25,
+      "total": 818,
+      "budget": 840,
+      "ndcg": 0.4255661055264917,
+      "utility": 0.29166666666666663
+    },
+    {
+      "caseId": "coffee-840",
+      "policy": "组合生成",
+      "ids": [
+        "f02",
+        "f04",
+        "f05",
+        "f12"
+      ],
+      "coverage": 1,
+      "total": 626,
+      "budget": 840,
+      "ndcg": 0.7923899649901895,
+      "utility": 0.9166666666666666
+    },
+    {
+      "caseId": "coffee-1200",
+      "policy": "逐件排序",
+      "ids": [
+        "f02",
+        "f10",
+        "f04",
+        "f05"
+      ],
+      "coverage": 0.75,
+      "total": 1086,
+      "budget": 1200,
+      "ndcg": 0.69281078892445,
+      "utility": 0.75
+    },
+    {
+      "caseId": "coffee-1200",
+      "policy": "组合生成",
+      "ids": [
+        "f02",
+        "f04",
+        "f05",
+        "f12"
+      ],
+      "coverage": 1,
+      "total": 626,
+      "budget": 1200,
+      "ndcg": 0.7923899649901895,
+      "utility": 0.9166666666666666
+    }
+  ],
+  "version": "recjev-v0.1-catalog1-rubric1",
+  "note": "12 个固定合成场景（4 场景 × 3 预算）。偏好标签人工设定且不输入评分器；效用 = 0.5 × 标签效用 + 0.5 × 需求覆盖。95% bootstrap 区间只描述此小样本，不代表真实用户。两策略共享一次评分结果与端到端延迟；种子只控制 bootstrap。无真实 CTR、GMV 或线上 A/B 结论。"
+}

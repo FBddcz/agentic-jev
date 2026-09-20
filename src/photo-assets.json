@@ -1,0 +1,68 @@
+{
+  "tent": {
+    "title": "File:Zagedan Ridge, Camping tent, Caucasus Mountains.jpg",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Zagedan_Ridge%2C_Camping_tent%2C_Caucasus_Mountains.jpg/960px-Zagedan_Ridge%2C_Camping_tent%2C_Caucasus_Mountains.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Zagedan_Ridge,_Camping_tent,_Caucasus_Mountains.jpg",
+    "author": "© Vyacheslav Argenberg",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "description": "Camping tent. Zagedan Ridge. Karachay-Cherkessia, Caucasus Mountains.",
+    "src": "/photos/tent.jpg",
+    "changes": "Resized, converted to JPEG; cropped to fit in the UI."
+  },
+  "chair": {
+    "title": "File:Helinox Ground Chair 1.jpg",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/51/Helinox_Ground_Chair_1.jpg/960px-Helinox_Ground_Chair_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Helinox_Ground_Chair_1.jpg",
+    "author": "PsamatheM",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "description": "Helinox Ground Chair",
+    "src": "/photos/chair.jpg",
+    "changes": "Resized, converted to JPEG; cropped to fit in the UI."
+  },
+  "lantern": {
+    "title": "File:Enbrighten LED Camping Lantern.jpg",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Enbrighten_LED_Camping_Lantern.jpg/960px-Enbrighten_LED_Camping_Lantern.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Enbrighten_LED_Camping_Lantern.jpg",
+    "author": "TaurusEmerald",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "description": "An Enbrighten LED camping lantern.",
+    "src": "/photos/lantern.jpg",
+    "changes": "Resized, converted to JPEG; cropped to fit in the UI."
+  },
+  "bottle": {
+    "title": "File:Stainless Steel Water Bottle.jpg",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Stainless_Steel_Water_Bottle.jpg/960px-Stainless_Steel_Water_Bottle.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Stainless_Steel_Water_Bottle.jpg",
+    "author": "Gannu03",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "description": "Stainless Steel Water Bottle (560 ml).",
+    "src": "/photos/bottle.jpg",
+    "changes": "Resized, converted to JPEG; cropped to fit in the UI."
+  },
+  "keyboard": {
+    "title": "File:Beautiful Mechanical Keyboard.jpg",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/Beautiful_Mechanical_Keyboard.jpg/960px-Beautiful_Mechanical_Keyboard.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Beautiful_Mechanical_Keyboard.jpg",
+    "author": "Anirban Saha",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "description": "A beautiful mechanical keyboard with custom keycaps sets added of black and white color.",
+    "src": "/photos/keyboard.jpg",
+    "changes": "Resized, converted to JPEG; cropped to fit in the UI."
+  },
+  "tray": {
+    "title": "File:Tray with espresso cups.jpg",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Tray_with_espresso_cups.jpg/960px-Tray_with_espresso_cups.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "page": "https://commons.wikimedia.org/wiki/File:Tray_with_espresso_cups.jpg",
+    "author": "Jberkel",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "description": "Wooden tray carrying two espresso cups",
+    "src": "/photos/tray.jpg",
+    "changes": "Resized, converted to JPEG; cropped to fit in the UI."
+  }
+}

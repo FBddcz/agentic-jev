@@ -1,0 +1,81 @@
+{
+  "note": "Browser CSS dimensions; screenshots captured after responsive reflow. Earlier zoom checks used 130% browser zoom.",
+  "discovery": [
+    {
+      "client": 1425,
+      "columns": "272.25px 272.25px 272.25px 272.25px",
+      "dpr": 1,
+      "height": 1000,
+      "overflow": false,
+      "scroll": 1425,
+      "width": 1440
+    },
+    {
+      "client": 1009,
+      "columns": "188px 188px 188px 188px",
+      "dpr": 1,
+      "height": 1000,
+      "overflow": false,
+      "scroll": 1009,
+      "width": 1024
+    },
+    {
+      "client": 753,
+      "columns": "149px 149px 149px 149px",
+      "dpr": 1,
+      "height": 1000,
+      "overflow": false,
+      "scroll": 753,
+      "width": 768
+    },
+    {
+      "client": 375,
+      "columns": "163.5px 163.5px",
+      "dpr": 1,
+      "height": 1000,
+      "overflow": false,
+      "scroll": 375,
+      "width": 390
+    },
+    {
+      "client": 305,
+      "columns": "277px",
+      "dpr": 1,
+      "height": 1000,
+      "overflow": false,
+      "scroll": 305,
+      "width": 320
+    }
+  ],
+  "labAndDialog": [
+    {
+      "client": 753,
+      "overflow": false,
+      "page": "lab",
+      "scroll": 753,
+      "width": 768
+    },
+    {
+      "client": 375,
+      "overflow": false,
+      "page": "lab",
+      "scroll": 375,
+      "width": 390
+    },
+    {
+      "client": 305,
+      "overflow": false,
+      "page": "lab",
+      "scroll": 305,
+      "width": 320
+    },
+    {
+      "client": 305,
+      "dialogScroll": 265,
+      "dialogWidth": 267,
+      "page": "dialog",
+      "scroll": 305,
+      "width": 320
+    }
+  ]
+}
